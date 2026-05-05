@@ -2,94 +2,127 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <!-- 加入 viewport 標籤，讓手機瀏覽器知道要正確縮放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>蘭頓螞蟻作曲家 (Langton's Ant Composer)</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #12121e; color: #eeeeee; margin: 0; padding: 20px; display: flex; gap: 20px; height: 100vh; box-sizing: border-box; overflow: hidden; }
-        #canvas-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        canvas { background-color: #ffffff; box-shadow: 0 0 25px rgba(0,0,0,0.9); border: 1px solid #444; border-radius: 4px; }
-        #controls { width: 720px; background-color: #1a1a2e; padding: 20px; border-radius: 12px; overflow-y: auto; box-shadow: 0 0 15px rgba(0,0,0,0.6); }
-        h2 { margin-top: 0; border-bottom: 2px solid #e94560; padding-bottom: 10px; color: #e94560; text-shadow: 0 0 10px rgba(233,69,96,0.5); }
-        h3 { color: #4da8da; margin-bottom: 10px; font-size: 16px; border-left: 4px solid #4da8da; padding-left: 8px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #12121e; color: #eeeeee; margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; gap: 20px; 
+            box-sizing: border-box; overflow-x: hidden;
+        }
+        #controls { width: 100%; background-color: #1a1a2e; padding: 20px; border-radius: 12px; box-sizing: border-box; box-shadow: 0 0 15px rgba(0,0,0,0.6); }
+        #canvas-container { width: 100%; display: flex; justify-content: center; align-items: flex-start; margin-bottom: 30px; }
+        
+        /* 畫布響應式設定：內部解析度維持800x800，外部用 CSS 自動縮放 */
+        canvas { 
+            background-color: #ffffff; box-shadow: 0 0 25px rgba(0,0,0,0.9); 
+            border: 1px solid #444; border-radius: 4px; 
+            width: 100%; max-width: 800px; height: auto; aspect-ratio: 1 / 1; 
+        }
+
+        /* 電腦版 (寬度大於 1024px) 恢復左右排列 */
+        @media (min-width: 1024px) {
+            body { flex-direction: row; height: 100vh; overflow: hidden; padding: 20px; }
+            #controls { width: 45%; max-width: 650px; overflow-y: auto; height: 100%; }
+            #canvas-container { width: 55%; height: 100%; align-items: center; }
+            canvas { width: auto; height: 95%; max-height: 800px; max-width: none; }
+        }
+
+        h2 { margin-top: 0; border-bottom: 2px solid #e94560; padding-bottom: 10px; color: #e94560; text-shadow: 0 0 10px rgba(233,69,96,0.5); font-size: 22px; line-height: 1.4; }
+        h3 { color: #f9a826; margin-bottom: 10px; font-size: 16px; border-left: 4px solid #f9a826; padding-left: 8px; }
         .control-group { background-color: #0f2038; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #2a3b5c; }
-        .rule-row { background-color: #16213e; padding: 12px; margin-bottom: 10px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-left: 6px solid #888; border-bottom: 1px solid #2a3b5c; }
-        .rule-row label { font-size: 13px; font-weight: bold; color: #a8dadd; display: flex; align-items: center; gap: 4px; }
-        select, input[type="color"], input[type="number"] { background-color: #0f2038; color: white; border: 1px solid #4da8da; padding: 5px; border-radius: 4px; outline: none; font-size: 13px; }
-        input[type="number"] { width: 60px; }
-        button { cursor: pointer; font-weight: bold; border-radius: 6px; transition: 0.2s; padding: 8px 12px; border: none; color: white; }
-        .btn-primary { background-color: #e94560; font-size: 15px; flex: 1; }
+        
+        .rule-row { background-color: #16213e; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-left: 6px solid #888; border-bottom: 1px solid #2a3b5c; }
+        .rule-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .rule-row label { font-size: 14px; font-weight: bold; color: #a8dadd; display: flex; align-items: center; gap: 4px; }
+        
+        select, input[type="color"], input[type="number"] { background-color: #0f2038; color: white; border: 1px solid #4da8da; padding: 6px; border-radius: 4px; outline: none; font-size: 14px; }
+        input[type="number"] { width: 70px; }
+        button { cursor: pointer; font-weight: bold; border-radius: 6px; transition: 0.2s; padding: 10px 12px; border: none; color: white; }
+        
+        /* 頂部控制按鈕排版優化 */
+        .global-controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn-primary { background-color: #e94560; font-size: 16px; flex: 1; min-width: 100px; }
         .btn-primary:hover { background-color: #ff5c77; box-shadow: 0 0 10px #e94560; }
-        .btn-secondary { background-color: #4da8da; font-size: 15px; flex: 1; }
+        .btn-secondary { background-color: #4da8da; font-size: 16px; flex: 1; min-width: 100px; }
         .btn-secondary:hover { background-color: #62baf0; }
-        .btn-danger { background-color: #533440; border: 1px solid #e94560; font-size: 15px; flex: 1; }
-        .btn-add { background-color: transparent; border: 1px dashed #e94560; width: 100%; margin-top: 5px; color: #e94560; padding: 10px; }
+        .btn-danger { background-color: #533440; border: 1px solid #e94560; font-size: 16px; flex: 1; min-width: 100px; }
+        .btn-danger:hover { background-color: #e94560; }
+        
+        .btn-add { background-color: transparent; border: 1px dashed #e94560; width: 100%; margin-top: 5px; color: #e94560; padding: 12px; font-size: 15px; }
         .btn-add:hover { background-color: #e94560; color: #fff; }
-        .btn-delete-rule { background-color: #ff4757; padding: 4px 8px; margin-left: auto; font-size: 12px; border-radius: 4px; }
-        .btn-save { background-color: #27ae60; font-size: 12px; padding: 6px; flex: 1; text-align: center; }
-        .btn-load { background-color: #8e44ad; font-size: 12px; padding: 6px; flex: 1; text-align: center; }
+        .btn-delete-rule { background-color: #ff4757; padding: 4px 12px; border-radius: 4px; font-size: 14px; }
+        .btn-save { background-color: #27ae60; font-size: 13px; padding: 8px; flex: 1; text-align: center; }
+        .btn-load { background-color: #8e44ad; font-size: 13px; padding: 8px; flex: 1; text-align: center; }
         .btn-load:disabled { background-color: #555; cursor: not-allowed; opacity: 0.5; }
-        .global-controls { display: flex; gap: 10px; margin-bottom: 10px; }
-        .flex-row { display: flex; gap: 15px; align-items: center; margin-bottom: 5px; flex-wrap: wrap; }
-        .step-display { font-size: 22px; font-weight: bold; color: #f9a826; text-align: center; margin-bottom: 10px; letter-spacing: 2px; }
-        .highlight-text { color: #f9a826; }
+        
+        .flex-row { display: flex; gap: 15px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .step-display { font-size: 24px; font-weight: bold; color: #f9a826; text-align: center; margin-bottom: 15px; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
     <div id="controls">
-        <h2>🎵 蘭頓螞蟻作曲家 (Langton's Ant Composer)</h2>
+        <h2>🎵 蘭頓螞蟻作曲家<br>(Langton's Ant Composer)</h2>
         <div class="step-display" id="stepCounterDisplay">目前步數: 0</div>
 
         <div class="global-controls">
-            <button id="startBtn" class="btn-primary">▶️ 播放 / 暫停</button>
-            <button id="stepBtn" class="btn-secondary">⏭️ 單步打拍</button>
+            <button id="startBtn" class="btn-primary">⏸ 暫停</button>
+            <button id="stepBtn" class="btn-secondary">⏭ 單步打拍</button>
             <button id="resetBtn" class="btn-danger">🔄 歸零重奏</button>
         </div>
 
-        <div class="control-group" style="border: 1px solid #f9a826;">
-            <h3 style="color: #f9a826; border-left-color: #f9a826;">🎹 樂理與和弦配置 (Music Theory)</h3>
+        <div class="control-group" style="border-color: #f9a826;">
+            <h3>🎹 樂理與和弦配置 (Music Theory)</h3>
             <div class="flex-row">
                 <label>主音 (Key): 
                     <select id="musicKey">
                         <option value="60">C</option><option value="61">C# / Db</option>
-                        <option value="62">D</option><option value="63">D# / Eb</option>
+                        <option value="62" selected>D</option><option value="63">D# / Eb</option>
                         <option value="64">E</option><option value="65">F</option>
                         <option value="66">F# / Gb</option><option value="67">G</option>
-                        <option value="68">G# / Ab</option><option value="69" selected>A</option>
+                        <option value="68">G# / Ab</option><option value="69">A</option>
                         <option value="70">A# / Bb</option><option value="71">B</option>
                     </select>
                 </label>
                 <label>調式 (Scale): 
                     <select id="musicScale">
                         <option value="major">大調 (Major)</option>
-                        <option value="minor" selected>自然小調 (Minor)</option>
+                        <option value="minor">自然小調 (Minor)</option>
                         <option value="pentatonic">五聲音階 (Pentatonic)</option>
                         <option value="dorian">多利安 (Dorian)</option>
-                        <option value="blues">藍調 (Blues)</option>
+                        <option value="blues" selected>藍調 (Blues)</option>
                     </select>
                 </label>
             </div>
-            <div class="flex-row" style="margin-top: 10px;">
+            <div class="flex-row">
                 <label>和弦進行 (1小節=16步):
                     <select id="chordProgression">
                         <option value="1">單一和弦 (1-1-1-1)</option>
                         <option value="1564">流行史詩 (1-5-6-4)</option>
                         <option value="1645">經典流行 (1-6-4-5)</option>
-                        <option value="6415" selected>史詩懸疑 (6-4-1-5)</option>
-                        <option value="2511">爵士進行 (2-5-1-1)</option>
+                        <option value="6415">史詩懸疑 (6-4-1-5)</option>
+                        <option value="2511" selected>爵士進行 (2-5-1-1)</option>
                         <option value="4536">王道進行 (4-5-3-6)</option>
                     </select>
                 </label>
-                <label>節奏 (BPM): <input type="number" id="bpm" value="260" min="40" max="800"></label>
             </div>
-            <p style="font-size: 11px; color: #aaa; margin: 8px 0 0 0;">💡 旋律與和聲會根據「和弦進行」自動調整音高。左右聲道(Panning)由螞蟻的X座標決定。</p>
+            <div class="flex-row">
+                <label>節奏 (BPM): <input type="number" id="bpm" value="100" min="40" max="800"></label>
+            </div>
+            <p style="font-size: 12px; color: #aaa; margin: 5px 0 0 0; line-height: 1.5;">💡 旋律與和聲會根據「和弦進行」自動調整音高。左右聲道(Panning)由螞蟻的X座標決定。</p>
         </div>
 
         <div class="control-group">
-            <h3>⏱️ 視覺引擎設定</h3>
+            <h3 style="color: #4da8da; border-color: #4da8da;">⏱️ 視覺引擎設定</h3>
             <div class="flex-row">
                 <label>高速運算: <input type="number" id="stepsPerFrame" value="1" min="1"> 步/影格 (靜音模式)</label>
-                <label>跳躍至: <input type="number" id="jumpSteps" value="10000" min="1" step="1000"> 步</label>
-                <button id="jumpBtn" class="btn-secondary" style="flex:none; padding: 4px 8px;">⏩ 瞬間跳躍</button>
+            </div>
+            <div class="flex-row" style="margin-top: 5px;">
+                <label>跳躍至: <input type="number" id="jumpSteps" value="1000" min="1" step="500"> 步</label>
+                <button id="jumpBtn" class="btn-secondary" style="flex:none; padding: 6px 10px; font-size: 13px;">⏩ 跳躍</button>
             </div>
             <div class="flex-row" style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
                 <label><input type="checkbox" id="showGrid" checked> 極細網格</label>
@@ -97,12 +130,12 @@
             </div>
         </div>
 
-        <h3>📝 樂團編制與狀態規則 (狀態 0 為背景底色)</h3>
+        <h3 style="color: #4da8da; border-color: #4da8da; margin-top: 20px;">📝 樂團編制與狀態規則 (狀態 0 為背景底色)</h3>
         <div id="rules-container"></div>
         <button id="addRuleBtn" class="btn-add">➕ 新增一個狀態 / 樂器</button>
 
         <div class="control-group" style="margin-top: 20px;">
-            <h3>💾 記憶體與存檔</h3>
+            <h3 style="color: #4da8da; border-color: #4da8da;">💾 記憶體與存檔</h3>
             <div style="display: flex; gap: 5px; margin-bottom: 5px;">
                 <button onclick="saveSettings(1)" class="btn-save">📥 儲存 1</button>
                 <button onclick="saveSettings(2)" class="btn-save">📥 儲存 2</button>
@@ -128,7 +161,6 @@
         blues: [0, 3, 4, 5, 7, 10]
     };
 
-    // 和弦進行的級數對應 (0-indexed based on scale array)
     const chordProgressionsMap = {
         "1": [0, 0, 0, 0],
         "1564": [0, 4, 5, 3],
@@ -138,9 +170,7 @@
         "4536": [3, 4, 2, 5]
     };
 
-    function midiToFreq(midiNote) {
-        return 440 * Math.pow(2, (midiNote - 69) / 12);
-    }
+    function midiToFreq(midiNote) { return 440 * Math.pow(2, (midiNote - 69) / 12); }
 
     // --- 2. 擴充樂器庫與音高邏輯 ---
     const pitchLogicOptions = [
@@ -177,7 +207,6 @@
     function initAudio() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            // 建立白噪音 Buffer (用於小鼓和銅鈸)
             const bufferSize = audioCtx.sampleRate * 2;
             noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = noiseBuffer.getChannelData(0);
@@ -189,7 +218,6 @@
     function playTone(logic, instrument, antX, antY, stepCount, octaveShift) {
         if (!audioCtx || audioCtx.state === 'suspended' || logic === 'mute') return;
         
-        // --- 樂理計算：決定頻率 ---
         const rootMidi = parseInt(document.getElementById('musicKey').value);
         const scaleType = document.getElementById('musicScale').value;
         const intervals = scaleIntervals[scaleType];
@@ -198,12 +226,11 @@
         const progType = document.getElementById('chordProgression').value;
         const progArray = chordProgressionsMap[progType];
         
-        // 每 16 步換一個和弦
         const currentMeasure = Math.floor(stepCount / 16);
         const currentChordDegree = progArray[currentMeasure % progArray.length];
 
         let degreeOffset = 0;
-        if (instrument !== 'drum' && instrument !== 'snare' && instrument !== 'hihat' && instrument !== 'cymbal') {
+        if (!['drum','snare','hihat','cymbal'].includes(instrument)) {
             if (logic === 'y_map_mid') degreeOffset = currentChordDegree + (antY % scaleLen);
             else if (logic === 'chord_root') degreeOffset = currentChordDegree;
             else if (logic === 'chord_third') degreeOffset = currentChordDegree + 2;
@@ -212,26 +239,22 @@
             else if (logic === 'random_scale') degreeOffset = currentChordDegree + Math.floor(Math.random() * scaleLen);
         }
 
-        // 處理跨八度
         const normalizedDegree = ((degreeOffset % scaleLen) + scaleLen) % scaleLen;
         const inherentOctave = Math.floor(degreeOffset / scaleLen);
         const finalMidiNote = rootMidi + intervals[normalizedDegree] + ((inherentOctave + parseInt(octaveShift)) * 12);
         const freq = midiToFreq(finalMidiNote);
 
-        // --- 空間聲學：立體聲 Panning ---
         const t = audioCtx.currentTime;
         const bpm = parseInt(document.getElementById('bpm').value) || 120;
-        const noteDuration = (60 / bpm) * 0.25; // 16分音符長度
+        const noteDuration = (60 / bpm) * 0.25; 
         
         const masterGain = audioCtx.createGain();
         const panner = audioCtx.createStereoPanner();
-        // X座標映射到 -1 (左) 到 1 (右)
         panner.pan.value = (antX / gridSize) * 2 - 1; 
         
         masterGain.connect(panner);
         panner.connect(audioCtx.destination);
 
-        // --- 合成器音色庫 ---
         if (instrument === 'drum') {
             const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.connect(masterGain);
             osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.1);
@@ -256,7 +279,6 @@
             masterGain.gain.setValueAtTime(0.5, t); masterGain.gain.exponentialRampToValueAtTime(0.01, t + 0.8);
             noise.start(t); noise.stop(t + 0.8);
         } else if (instrument === 'organ') {
-            // 基礎音 + 八度 + 十二度
             [1, 2, 3].forEach((mult, i) => {
                 const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.frequency.value = freq * mult;
                 const oscGain = audioCtx.createGain(); oscGain.gain.value = [0.5, 0.3, 0.2][i];
@@ -267,7 +289,7 @@
             masterGain.gain.setTargetAtTime(0, t + noteDuration, 0.05);
         } else if (instrument === 'bell') {
             const osc1 = audioCtx.createOscillator(); osc1.type = 'sine'; osc1.frequency.value = freq;
-            const osc2 = audioCtx.createOscillator(); osc2.type = 'sine'; osc2.frequency.value = freq * 2.78; // 鐘聲泛音
+            const osc2 = audioCtx.createOscillator(); osc2.type = 'sine'; osc2.frequency.value = freq * 2.78; 
             osc1.connect(masterGain); osc2.connect(masterGain);
             masterGain.gain.setValueAtTime(0.8, t); masterGain.gain.exponentialRampToValueAtTime(0.01, t + 0.6);
             osc1.start(t); osc2.start(t); osc1.stop(t + 0.6); osc2.stop(t + 0.6);
@@ -276,7 +298,7 @@
             const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 800;
             osc.connect(filter); filter.connect(masterGain);
             masterGain.gain.setValueAtTime(0, t); masterGain.gain.linearRampToValueAtTime(0.3, t + 0.1);
-            masterGain.gain.setTargetAtTime(0, t + noteDuration * 4, 0.2); // 長殘響
+            masterGain.gain.setTargetAtTime(0, t + noteDuration * 4, 0.2); 
             osc.start(t); osc.stop(t + noteDuration * 4 + 1);
         } else if (instrument === 'pluck') {
             const osc = audioCtx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = freq;
@@ -310,9 +332,12 @@
     const cellSize = canvas.width / gridSize;
     let grid = [], antX, antY, direction, isRunning = false, animationId = null, lastStepTime = 0, currentStepCount = 0, rulesData = []; 
 
+    // ✅ 套用截圖上的初始四個狀態
     let initialRules = [
-        { turn: 'R', color: '#16213e', logic: 'chord_root', instrument: 'synth_pad', octave: '0' }, 
-        { turn: 'L', color: '#e94560', logic: 'y_map_mid', instrument: 'pluck', octave: '1' }
+        { turn: 'R', color: '#1a1a2e', logic: 'chord_third', instrument: 'snare', octave: '0' }, 
+        { turn: 'L', color: '#e94560', logic: 'chord_fifth', instrument: 'xylophone', octave: '0' },
+        { turn: 'L', color: '#f9a826', logic: 'arpeggio', instrument: 'square', octave: '0' },
+        { turn: 'R', color: '#27ae60', logic: 'y_map_mid', instrument: 'drum', octave: '0' }
     ];
 
     function renderRulesUI() {
@@ -350,8 +375,8 @@
             </select>`;
 
             row.innerHTML = `
-                <div style="width: 100%; display: flex; justify-content: space-between;">
-                    <span style="color: #fff; font-weight: bold;">📝 狀態 ${index} ${index===0 ? '(背景底色)' : ''}</span>
+                <div class="rule-header">
+                    <span style="color: #fff; font-weight: bold; font-size: 15px;">📝 狀態 ${index} ${index===0 ? '(背景底色)' : ''}</span>
                     <button class="btn-delete-rule" onclick="deleteRule(${index})">✖</button>
                 </div>
                 <label>方向: ${turnHtml}</label>
@@ -371,7 +396,7 @@
     };
 
     document.getElementById('addRuleBtn').addEventListener('click', () => {
-        initialRules.push({ turn: 'R', color: '#f9a826', logic: 'arpeggio', instrument: 'marimba', octave: '0' });
+        initialRules.push({ turn: 'R', color: '#4da8da', logic: 'arpeggio', instrument: 'pluck', octave: '0' });
         renderRulesUI(); fullReset();
     });
 
@@ -388,7 +413,7 @@
     function updateRulesData() {
         rulesData = getConfigFromUI();
         document.querySelectorAll('.rule-row').forEach((row, i) => row.style.borderLeftColor = rulesData[i].color);
-        drawFullGrid();
+        // 不在這裡呼叫 drawFullGrid，讓 fullReset 來統一處理初始畫面，避免未準備好就繪製
     }
 
     // --- 存檔與載入 ---
@@ -417,10 +442,10 @@
         if (savedData) {
             const settings = JSON.parse(savedData);
             initialRules = settings.rules; renderRulesUI();
-            document.getElementById('bpm').value = settings.bpm || 260;
-            document.getElementById('musicKey').value = settings.musicKey || '69';
-            document.getElementById('musicScale').value = settings.musicScale || 'minor';
-            document.getElementById('chordProgression').value = settings.chordProgression || '6415';
+            document.getElementById('bpm').value = settings.bpm || 100;
+            document.getElementById('musicKey').value = settings.musicKey || '62';
+            document.getElementById('musicScale').value = settings.musicScale || 'blues';
+            document.getElementById('chordProgression').value = settings.chordProgression || '2511';
             document.getElementById('stepsPerFrame').value = settings.stepsPerFrame || 1;
             document.getElementById('showGrid').checked = settings.showGrid !== false;
             document.getElementById('gridColor').value = settings.gridColor || '#cccccc';
@@ -437,6 +462,7 @@
         ctx.fillStyle = '#ff0000'; ctx.fillRect(antX * cellSize + 2, antY * cellSize + 2, cellSize - 4, cellSize - 4);
     }
     function drawFullGrid() {
+        if (!rulesData || rulesData.length === 0) return;
         const bgColor = rulesData[0] ? rulesData[0].color : '#FFFFFF';
         ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (let y = 0; y < gridSize; y++) {
@@ -496,7 +522,7 @@
         if (!isRunning) return;
 
         const stepsPerFrame = parseInt(document.getElementById('stepsPerFrame').value) || 1;
-        const bpm = parseInt(document.getElementById('bpm').value) || 120;
+        const bpm = parseInt(document.getElementById('bpm').value) || 100;
         const delayMs = 60000 / (bpm * 4); // 16分音符延遲
 
         if (stepsPerFrame > 1) {
@@ -512,41 +538,57 @@
         animationId = requestAnimationFrame(loop);
     }
 
+    // ✅ 改進重置邏輯，確保畫面與按鈕狀態正確歸零
     function fullReset() {
-        isRunning = false; document.getElementById('startBtn').innerHTML = '▶️ 播放 / 暫停'; cancelAnimationFrame(animationId);
+        isRunning = false; 
+        document.getElementById('startBtn').innerHTML = '▶️ 播放'; 
+        cancelAnimationFrame(animationId);
+        
         grid = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
         antX = Math.floor(gridSize / 2); antY = Math.floor(gridSize / 2); direction = 0; currentStepCount = 0;
-        document.getElementById('stepCounterDisplay').innerText = `目前步數: 0`; drawFullGrid();
+        document.getElementById('stepCounterDisplay').innerText = `目前步數: 0`; 
+        
+        updateRulesData(); // 確保資料同步後再畫圖
+        drawFullGrid();
     }
 
     // --- 事件綁定 ---
     document.getElementById('startBtn').addEventListener('click', () => {
-        initAudio(); isRunning = !isRunning;
-        document.getElementById('startBtn').innerHTML = isRunning ? '⏸️ 暫停' : '▶️ 播放 / 暫停';
-        if (isRunning) { lastStepTime = performance.now(); animationId = requestAnimationFrame(loop); } 
+        initAudio(); 
+        isRunning = !isRunning;
+        // ✅ 按鈕文字會根據播放狀態動態改變
+        document.getElementById('startBtn').innerHTML = isRunning ? '⏸ 暫停' : '▶️ 播放';
+        if (isRunning) { 
+            lastStepTime = performance.now(); 
+            animationId = requestAnimationFrame(loop); 
+        } 
         else cancelAnimationFrame(animationId);
     });
 
     document.getElementById('stepBtn').addEventListener('click', () => {
-        initAudio(); if (isRunning) document.getElementById('startBtn').click();
-        executeStep(true, true); document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
+        initAudio(); 
+        if (isRunning) document.getElementById('startBtn').click();
+        executeStep(true, true); 
+        document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
     });
 
     document.getElementById('jumpBtn').addEventListener('click', () => {
         if (isRunning) document.getElementById('startBtn').click();
         const jumpSteps = parseInt(document.getElementById('jumpSteps').value) || 1;
         for(let i=0; i < jumpSteps; i++) executeStep(false, false); 
-        drawFullGrid(); document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
+        drawFullGrid(); 
+        document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
     });
 
     document.getElementById('resetBtn').addEventListener('click', fullReset);
     document.getElementById('showGrid').addEventListener('change', drawFullGrid);
     document.getElementById('gridColor').addEventListener('change', drawFullGrid);
 
-    // 初始化
+    // --- 初始化執行 ---
+    // ✅ 打開網頁後立刻將 UI、狀態與畫布準備好，點播放即可開始
     renderRulesUI();
     checkSaveSlots(); 
-    fullReset();
+    fullReset(); 
 </script>
 </body>
 </html>
