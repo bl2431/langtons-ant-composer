@@ -2,7 +2,6 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <!-- 加入 viewport 標籤，讓手機瀏覽器知道要正確縮放 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>蘭頓螞蟻作曲家 (Langton's Ant Composer)</title>
     <style>
@@ -15,14 +14,12 @@
         #controls { width: 100%; background-color: #1a1a2e; padding: 20px; border-radius: 12px; box-sizing: border-box; box-shadow: 0 0 15px rgba(0,0,0,0.6); }
         #canvas-container { width: 100%; display: flex; justify-content: center; align-items: flex-start; margin-bottom: 30px; }
         
-        /* 畫布響應式設定：內部解析度維持800x800，外部用 CSS 自動縮放 */
         canvas { 
             background-color: #ffffff; box-shadow: 0 0 25px rgba(0,0,0,0.9); 
             border: 1px solid #444; border-radius: 4px; 
             width: 100%; max-width: 800px; height: auto; aspect-ratio: 1 / 1; 
         }
 
-        /* 電腦版 (寬度大於 1024px) 恢復左右排列 */
         @media (min-width: 1024px) {
             body { flex-direction: row; height: 100vh; overflow: hidden; padding: 20px; }
             #controls { width: 45%; max-width: 650px; overflow-y: auto; height: 100%; }
@@ -42,7 +39,6 @@
         input[type="number"] { width: 70px; }
         button { cursor: pointer; font-weight: bold; border-radius: 6px; transition: 0.2s; padding: 10px 12px; border: none; color: white; }
         
-        /* 頂部控制按鈕排版優化 */
         .global-controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         .btn-primary { background-color: #e94560; font-size: 16px; flex: 1; min-width: 100px; }
         .btn-primary:hover { background-color: #ff5c77; box-shadow: 0 0 10px #e94560; }
@@ -60,12 +56,36 @@
         
         .flex-row { display: flex; gap: 15px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
         .step-display { font-size: 24px; font-weight: bold; color: #f9a826; text-align: center; margin-bottom: 15px; letter-spacing: 2px; }
+        
+        /* 說明區塊專用樣式 */
+        .info-box { font-size: 12px; color: #a0b2c6; margin-bottom: 15px; background: #0f2038; padding: 8px 12px; border-radius: 6px; border: 1px dashed #4da8da; }
+        .info-box summary { cursor: pointer; font-weight: bold; color: #4da8da; outline: none; list-style: none; display: flex; align-items: center; gap: 5px; }
+        .info-box summary::-webkit-details-marker { display: none; }
+        .info-box summary:hover { color: #62baf0; }
+        .info-content { margin-top: 10px; line-height: 1.6; border-top: 1px solid #2a3b5c; padding-top: 10px; }
+        .info-content strong { color: #f9a826; }
     </style>
 </head>
 <body>
 
     <div id="controls">
-        <h2>🎵 蘭頓螞蟻作曲家<br>(Langton's Ant Composer)</h2>
+        <h2>🎵 蘭頓螞蟻作曲家<br><span style="font-size: 18px;">(Langton's Ant Composer)</span></h2>
+        
+        <!-- 💡 新增的簡介與說明區塊 (可折疊，不佔空間) -->
+        <details class="info-box">
+            <summary>ℹ️ 這是什麼？該如何操作？ (點擊展開說明)</summary>
+            <div class="info-content">
+                <strong>🐜 什麼是蘭頓螞蟻？</strong><br>
+                它是在網格上依簡單規則轉向、塗色的虛擬機器。會在短暫混亂後，奇蹟似地創造出對稱且無限延伸的幾何圖形。<br><br>
+                <strong>🎯 創作理念：</strong><br>
+                將這份「混沌中的秩序」視覺轉化為音樂！讓使用者透過調整參數，體驗細胞自動機與演算法作曲 (Algorithmic Composition) 的聽覺碰撞。<br><br>
+                <strong>🕹️ 操作三步驟：</strong><br>
+                1. <b>定調：</b>設定主音、調式與和弦，決定整首歌的情緒。<br>
+                2. <b>編制：</b>在下方的「狀態規則」中，替每種顏色指派專屬樂器、音高邏輯與轉向。<br>
+                3. <b>開演：</b>點擊「▶️ 播放」，戴上耳機享受螞蟻為你譜寫的立體聲樂章！
+            </div>
+        </details>
+
         <div class="step-display" id="stepCounterDisplay">目前步數: 0</div>
 
         <div class="global-controls">
@@ -152,7 +172,6 @@
     <div id="canvas-container"><canvas id="gridCanvas" width="800" height="800"></canvas></div>
 
 <script>
-    // --- 1. 深度樂理引擎 (Music Theory Engine) ---
     const scaleIntervals = {
         major: [0, 2, 4, 5, 7, 9, 11],
         minor: [0, 2, 3, 5, 7, 8, 10],
@@ -172,7 +191,6 @@
 
     function midiToFreq(midiNote) { return 440 * Math.pow(2, (midiNote - 69) / 12); }
 
-    // --- 2. 擴充樂器庫與音高邏輯 ---
     const pitchLogicOptions = [
         { value: 'y_map_mid', label: '🎼 空間旋律 (依Y軸)' },
         { value: 'chord_root', label: '🎸 和弦根音' },
@@ -200,7 +218,6 @@
         { value: 'sine', label: '🫧 正弦波 (Sine)' }
     ];
 
-    // --- 3. Web Audio API 音效合成引擎 ---
     let audioCtx;
     let noiseBuffer;
 
@@ -325,14 +342,12 @@
         }
     }
 
-    // --- 4. 系統變數與 UI ---
     const canvas = document.getElementById('gridCanvas');
     const ctx = canvas.getContext('2d');
     const gridSize = 100; 
     const cellSize = canvas.width / gridSize;
     let grid = [], antX, antY, direction, isRunning = false, animationId = null, lastStepTime = 0, currentStepCount = 0, rulesData = []; 
 
-    // ✅ 套用截圖上的初始四個狀態
     let initialRules = [
         { turn: 'R', color: '#1a1a2e', logic: 'chord_third', instrument: 'snare', octave: '0' }, 
         { turn: 'L', color: '#e94560', logic: 'chord_fifth', instrument: 'xylophone', octave: '0' },
@@ -413,10 +428,8 @@
     function updateRulesData() {
         rulesData = getConfigFromUI();
         document.querySelectorAll('.rule-row').forEach((row, i) => row.style.borderLeftColor = rulesData[i].color);
-        // 不在這裡呼叫 drawFullGrid，讓 fullReset 來統一處理初始畫面，避免未準備好就繪製
     }
 
-    // --- 存檔與載入 ---
     function checkSaveSlots() {
         for(let i=1; i<=3; i++) {
             const btn = document.getElementById('loadBtn' + i);
@@ -453,7 +466,6 @@
         }
     };
 
-    // --- 繪圖邏輯 ---
     function drawCell(x, y, stateIndex) {
         ctx.fillStyle = rulesData[stateIndex] ? rulesData[stateIndex].color : '#000';
         ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
@@ -479,7 +491,6 @@
         drawAnt();
     }
 
-    // --- 核心演算法 (8方位) ---
     function executeStep(playAudio = true, renderImmediately = true) {
         if (rulesData.length === 0) return;
         let currentState = grid[antY][antX];
@@ -523,7 +534,7 @@
 
         const stepsPerFrame = parseInt(document.getElementById('stepsPerFrame').value) || 1;
         const bpm = parseInt(document.getElementById('bpm').value) || 100;
-        const delayMs = 60000 / (bpm * 4); // 16分音符延遲
+        const delayMs = 60000 / (bpm * 4); 
 
         if (stepsPerFrame > 1) {
             for (let i = 0; i < stepsPerFrame; i++) executeStep(false, i === stepsPerFrame - 1);
@@ -538,7 +549,6 @@
         animationId = requestAnimationFrame(loop);
     }
 
-    // ✅ 改進重置邏輯，確保畫面與按鈕狀態正確歸零
     function fullReset() {
         isRunning = false; 
         document.getElementById('startBtn').innerHTML = '▶️ 播放'; 
@@ -548,15 +558,13 @@
         antX = Math.floor(gridSize / 2); antY = Math.floor(gridSize / 2); direction = 0; currentStepCount = 0;
         document.getElementById('stepCounterDisplay').innerText = `目前步數: 0`; 
         
-        updateRulesData(); // 確保資料同步後再畫圖
+        updateRulesData(); 
         drawFullGrid();
     }
 
-    // --- 事件綁定 ---
     document.getElementById('startBtn').addEventListener('click', () => {
         initAudio(); 
         isRunning = !isRunning;
-        // ✅ 按鈕文字會根據播放狀態動態改變
         document.getElementById('startBtn').innerHTML = isRunning ? '⏸ 暫停' : '▶️ 播放';
         if (isRunning) { 
             lastStepTime = performance.now(); 
@@ -584,8 +592,6 @@
     document.getElementById('showGrid').addEventListener('change', drawFullGrid);
     document.getElementById('gridColor').addEventListener('change', drawFullGrid);
 
-    // --- 初始化執行 ---
-    // ✅ 打開網頁後立刻將 UI、狀態與畫布準備好，點播放即可開始
     renderRulesUI();
     checkSaveSlots(); 
     fullReset(); 
