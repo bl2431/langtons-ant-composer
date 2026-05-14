@@ -31,7 +31,7 @@
         h3 { color: #f9a826; margin-bottom: 10px; font-size: 16px; border-left: 4px solid #f9a826; padding-left: 8px; }
         .control-group { background-color: #0f2038; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #2a3b5c; }
         
-        .rule-row { background-color: #16213e; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-left: 6px solid #888; border-bottom: 1px solid #2a3b5c; }
+        .rule-row { background-color: #16213e; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-left: 6px solid #888; border-bottom: 1px solid #2a3b5c; position: relative; }
         .rule-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .rule-row label { font-size: 14px; font-weight: bold; color: #a8dadd; display: flex; align-items: center; gap: 4px; }
         
@@ -46,12 +46,16 @@
         .btn-secondary:hover { background-color: #62baf0; }
         .btn-danger { background-color: #533440; border: 1px solid #e94560; font-size: 16px; flex: 1; min-width: 100px; }
         .btn-danger:hover { background-color: #e94560; }
+        .btn-random { background-color: #8e44ad; font-size: 16px; flex: 1; min-width: 100px; }
+        .btn-random:hover { background-color: #9b59b6; box-shadow: 0 0 10px #8e44ad; }
         
         .btn-add { background-color: transparent; border: 1px dashed #e94560; width: 100%; margin-top: 5px; color: #e94560; padding: 12px; font-size: 15px; }
         .btn-add:hover { background-color: #e94560; color: #fff; }
         .btn-delete-rule { background-color: #ff4757; padding: 4px 12px; border-radius: 4px; font-size: 14px; }
+        .btn-random-rule { background-color: #8e44ad; padding: 4px 10px; border-radius: 4px; font-size: 14px; margin-right: 5px; }
+        
         .btn-save { background-color: #27ae60; font-size: 13px; padding: 8px; flex: 1; text-align: center; }
-        .btn-load { background-color: #8e44ad; font-size: 13px; padding: 8px; flex: 1; text-align: center; }
+        .btn-load { background-color: #2a3b5c; font-size: 13px; padding: 8px; flex: 1; text-align: center; }
         .btn-load:disabled { background-color: #555; cursor: not-allowed; opacity: 0.5; }
         
         .flex-row { display: flex; gap: 15px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
@@ -79,7 +83,7 @@
                 將這份「混沌中的秩序」視覺轉化為音樂！讓使用者透過調整參數，體驗細胞自動機與演算法作曲的聽覺碰撞。<br><br>
                 <strong>🕹️ 操作三步驟：</strong><br>
                 1. <b>定調：</b>設定起始音、調式與網格類型，決定基本風格。<br>
-                2. <b>編制：</b>替每種顏色指派專屬樂器、高低音與音高邏輯 (打擊樂器除外)。<br>
+                2. <b>編制：</b>替每種顏色指派專屬樂器、高低音與音高邏輯。<br>
                 3. <b>開演：</b>點擊「▶️ 播放」，戴上耳機享受這場演算法視覺音樂秀！
             </div>
         </details>
@@ -90,6 +94,7 @@
             <button id="startBtn" class="btn-primary">⏸ 暫停</button>
             <button id="stepBtn" class="btn-secondary">⏭ 單步打拍</button>
             <button id="resetBtn" class="btn-danger">🔄 歸零重奏</button>
+            <button id="randomAllBtn" class="btn-random" onclick="randomizeAllRules()">🎲 一鍵全隨機</button>
         </div>
 
         <div class="control-group" style="border-color: #f9a826;">
@@ -137,7 +142,8 @@
             <div class="flex-row">
                 <label>網格類型: 
                     <select id="gridType" onchange="onGridTypeChange()" style="background-color: #1a1a2e; font-weight:bold; color:#4da8da;">
-                        <option value="square">方格 (8方向)</option>
+                        <option value="square_4">方格 (4方向)</option>
+                        <option value="square_8" selected>方格 (8方向斜角)</option>
                         <option value="hex">六角蜂巢 (6方向)</option>
                     </select>
                 </label>
@@ -178,27 +184,20 @@
 
 <script>
     const scaleIntervals = {
-        major: [0, 2, 4, 5, 7, 9, 11],
-        minor: [0, 2, 3, 5, 7, 8, 10],
-        pentatonic: [0, 2, 4, 7, 9],
-        dorian: [0, 2, 3, 5, 7, 9, 10],
-        blues: [0, 3, 4, 5, 7, 10]
+        major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10],
+        pentatonic: [0, 2, 4, 7, 9], dorian: [0, 2, 3, 5, 7, 9, 10], blues: [0, 3, 4, 5, 7, 10]
     };
 
     const chordProgressionsMap = {
-        "1": [0, 0, 0, 0],
-        "1564": [0, 4, 5, 3],
-        "1645": [0, 5, 3, 4],
-        "6415": [5, 3, 0, 4],
-        "2511": [1, 4, 0, 0],
-        "4536": [3, 4, 2, 5]
+        "1": [0, 0, 0, 0], "1564": [0, 4, 5, 3], "1645": [0, 5, 3, 4],
+        "6415": [5, 3, 0, 4], "2511": [1, 4, 0, 0], "4536": [3, 4, 2, 5]
     };
 
     function midiToFreq(midiNote) { return 440 * Math.pow(2, (midiNote - 69) / 12); }
 
     const pitchLogicOptions = [
-        { value: 'y_map_up', label: '🎼 依Y軸(上或下)增減' },
-        { value: 'x_map_right', label: '🎼 依X軸(左或右)增減' },
+        { value: 'y_axis', label: '🎼 依Y軸移調 (配半音階距)' },
+        { value: 'x_axis', label: '🎼 依X軸移調 (配半音階距)' },
         { value: 'chord_root', label: '🎸 和弦根音' },
         { value: 'chord_third', label: '🎹 和弦三音' },
         { value: 'chord_fifth', label: '🎻 和弦五音' },
@@ -252,7 +251,7 @@
         if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    function playTone(logic, instrument, antX, antY, stepCount, octaveShift) {
+    function playTone(logic, instrument, antX, antY, stepCount, octaveShift, axisStep) {
         if (!audioCtx || audioCtx.state === 'suspended' || logic === 'mute') return;
         
         const rootMidi = parseInt(document.getElementById('musicKey').value);
@@ -268,19 +267,26 @@
 
         let freq = 0;
         
-        // 只有非打擊樂才需要計算音高
         if (!['drum','snare','hihat','cymbal'].includes(instrument)) {
             let finalMidiNote = rootMidi;
             
-            // 處理絕對 12 半音
             if (logic.startsWith('semi_')) {
                 let semiIndex = parseInt(logic.split('_')[1]) - 1; 
                 finalMidiNote = rootMidi + semiIndex + (parseInt(octaveShift) * 12);
+            } else if (logic === 'y_axis' || logic === 'x_axis') {
+                let stepSize = parseInt(axisStep) || 1;
+                let axisShift = 0;
+                // 中心點設為 gridSize/2
+                if (logic === 'y_axis') axisShift = Math.floor((gridSize/2 - antY)) * stepSize; 
+                else if (logic === 'x_axis') axisShift = Math.floor((antX - gridSize/2)) * stepSize;
+
+                const normalizedDegree = ((currentChordDegree % scaleLen) + scaleLen) % scaleLen;
+                const inherentOctave = Math.floor(currentChordDegree / scaleLen);
+                let baseMidi = rootMidi + intervals[normalizedDegree] + ((inherentOctave + parseInt(octaveShift)) * 12);
+                finalMidiNote = baseMidi + axisShift;
             } else {
                 let degreeOffset = currentChordDegree;
-                if (logic === 'y_map_up') degreeOffset += Math.floor((gridSize - antY) / 3); 
-                else if (logic === 'x_map_right') degreeOffset += Math.floor(antX / 3);
-                else if (logic === 'chord_third') degreeOffset += 2;
+                if (logic === 'chord_third') degreeOffset += 2;
                 else if (logic === 'chord_fifth') degreeOffset += 4;
                 else if (logic === 'arpeggio') degreeOffset += [0, 2, 4, Math.floor(scaleLen/2)][stepCount % 4];
                 else if (logic === 'random_scale') degreeOffset += Math.floor(Math.random() * scaleLen);
@@ -289,7 +295,6 @@
                 const inherentOctave = Math.floor(degreeOffset / scaleLen);
                 finalMidiNote = rootMidi + intervals[normalizedDegree] + ((inherentOctave + parseInt(octaveShift)) * 12);
             }
-            // 限制在人耳與喇叭可視範圍內防破音
             finalMidiNote = Math.max(12, Math.min(115, finalMidiNote));
             freq = midiToFreq(finalMidiNote);
         }
@@ -405,14 +410,14 @@
     let grid = [], antX, antY, direction, isRunning = false, animationId = null, lastStepTime = 0, currentStepCount = 0, rulesData = []; 
 
     let initialRules = [
-        { turn: '2', color: '#1a1a2e', logic: 'chord_third', instrument: 'snare', octave: '0' }, 
-        { turn: '6', color: '#e94560', logic: 'chord_fifth', instrument: 'xylophone', octave: '0' },
-        { turn: '6', color: '#f9a826', logic: 'arpeggio', instrument: 'square', octave: '0' },
-        { turn: '2', color: '#27ae60', logic: 'y_map_up', instrument: 'drum', octave: '0' }
+        { turn: '1', color: '#1a1a2e', logic: 'chord_root', instrument: 'snare', octave: '0', step: 1 }, 
+        { turn: '3', color: '#e94560', logic: 'y_axis', instrument: 'xylophone', octave: '0', step: 1 },
+        { turn: '3', color: '#f9a826', logic: 'arpeggio', instrument: 'square', octave: '0', step: 1 },
+        { turn: '1', color: '#27ae60', logic: 'x_axis', instrument: 'drum', octave: '0', step: 1 }
     ];
 
-    function getTurnHtml(rule, isHex) {
-        if (isHex) {
+    function getTurnHtml(rule, gridType) {
+        if (gridType === 'hex') {
             return `
                 <option value="0" ${rule.turn == '0' ? 'selected' : ''}>N (直走 0°)</option>
                 <option value="1" ${rule.turn == '1' ? 'selected' : ''}>R1 (右轉 60°)</option>
@@ -420,6 +425,13 @@
                 <option value="3" ${rule.turn == '3' ? 'selected' : ''}>U (迴轉 180°)</option>
                 <option value="4" ${rule.turn == '4' ? 'selected' : ''}>L2 (左轉 120°)</option>
                 <option value="5" ${rule.turn == '5' ? 'selected' : ''}>L1 (左轉 60°)</option>
+            `;
+        } else if (gridType === 'square_4') {
+            return `
+                <option value="0" ${rule.turn == '0' ? 'selected' : ''}>U (直走)</option>
+                <option value="1" ${rule.turn == '1' ? 'selected' : ''}>R (右轉 90°)</option>
+                <option value="2" ${rule.turn == '2' ? 'selected' : ''}>D (迴轉 180°)</option>
+                <option value="3" ${rule.turn == '3' ? 'selected' : ''}>L (左轉 90°)</option>
             `;
         } else {
             return `
@@ -437,16 +449,16 @@
 
     function renderRulesUI() {
         const container = document.getElementById('rules-container');
-        const isHex = document.getElementById('gridType').value === 'hex';
+        const gridType = document.getElementById('gridType').value;
         container.innerHTML = '';
         
         initialRules.forEach((rule, index) => {
             const row = document.createElement('div');
             row.className = 'rule-row';
             
-            let turnHtml = `<select class="rule-turn" onchange="updateRulesData()">${getTurnHtml(rule, isHex)}</select>`;
+            let turnHtml = `<select class="rule-turn" onchange="updateRulesData()">${getTurnHtml(rule, gridType)}</select>`;
 
-            let logicHtml = `<select class="rule-logic" onchange="updateRulesData()">`;
+            let logicHtml = `<select class="rule-logic" onchange="updateRuleDisables(); updateRulesData();">`;
             pitchLogicOptions.forEach(opt => logicHtml += `<option value="${opt.value}" ${rule.logic === opt.value ? 'selected' : ''}>${opt.label}</option>`);
             logicHtml += `</select>`;
 
@@ -465,13 +477,17 @@
             row.innerHTML = `
                 <div class="rule-header">
                     <span style="color: #fff; font-weight: bold; font-size: 15px;">📝 狀態 ${index} ${index===0 ? '(背景底色)' : ''}</span>
-                    <button class="btn-delete-rule" onclick="deleteRule(${index})">✖</button>
+                    <div>
+                        <button class="btn-random-rule" onclick="randomizeRule(${index})">🎲 隨機此狀態</button>
+                        <button class="btn-delete-rule" onclick="deleteRule(${index})">✖</button>
+                    </div>
                 </div>
                 <label>方向: ${turnHtml}</label>
                 <label>顏色: <input type="color" class="rule-color" value="${rule.color}" onchange="updateRulesData()"></label>
                 <label>樂器: ${instHtml}</label>
                 <label>高/低音: ${octaveHtml}</label>
                 <label>音高/邏輯: ${logicHtml}</label>
+                <label>半音階距: <input type="number" class="rule-step" value="${rule.step || 1}" min="-12" max="12" onchange="updateRulesData()"></label>
             `;
             container.appendChild(row);
         });
@@ -479,24 +495,72 @@
         updateRulesData();
     }
 
-    // 自動判斷打擊樂並反灰音高選單
     window.updateRuleDisables = function() {
         document.querySelectorAll('.rule-row').forEach(row => {
             let inst = row.querySelector('.rule-inst').value;
             let isPerc = ['drum','snare','hihat','cymbal'].includes(inst);
-            row.querySelector('.rule-logic').disabled = isPerc;
-            row.querySelector('.rule-octave').disabled = isPerc;
-            row.querySelector('.rule-logic').style.opacity = isPerc ? '0.4' : '1';
-            row.querySelector('.rule-octave').style.opacity = isPerc ? '0.4' : '1';
+            
+            let logicSelect = row.querySelector('.rule-logic');
+            let octaveSelect = row.querySelector('.rule-octave');
+            let stepInput = row.querySelector('.rule-step');
+            
+            // 打擊樂防呆
+            logicSelect.disabled = isPerc;
+            octaveSelect.disabled = isPerc;
+            logicSelect.style.opacity = isPerc ? '0.4' : '1';
+            octaveSelect.style.opacity = isPerc ? '0.4' : '1';
+
+            // X/Y軸階距控制
+            let isAxis = (logicSelect.value === 'y_axis' || logicSelect.value === 'x_axis');
+            if (isPerc || !isAxis) {
+                stepInput.disabled = true;
+                stepInput.style.opacity = '0.4';
+            } else {
+                stepInput.disabled = false;
+                stepInput.style.opacity = '1';
+            }
         });
     }
 
+    // --- 隨機系統 ---
+    function getRandomHexColor() {
+        return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+    }
+
+    window.randomizeRule = function(index) {
+        const gridType = document.getElementById('gridType').value;
+        let maxTurn = gridType === 'hex' ? 6 : (gridType === 'square_4' ? 4 : 8);
+        let rule = initialRules[index];
+        
+        rule.turn = Math.floor(Math.random() * maxTurn).toString();
+        rule.color = getRandomHexColor();
+        rule.instrument = instrumentOptions[Math.floor(Math.random() * instrumentOptions.length)].value;
+        
+        let isPerc = ['drum','snare','hihat','cymbal'].includes(rule.instrument);
+        if (isPerc) {
+            rule.logic = 'chord_root'; rule.octave = '0'; rule.step = 1;
+        } else {
+            rule.logic = pitchLogicOptions[Math.floor(Math.random() * pitchLogicOptions.length)].value;
+            rule.octave = (Math.floor(Math.random() * 5) - 2).toString(); // -2 ~ 2
+            let s = Math.floor(Math.random() * 7) - 3; // -3 ~ 3
+            rule.step = s === 0 ? 1 : s;
+        }
+        renderRulesUI();
+        fullReset();
+    }
+
+    window.randomizeAllRules = function() {
+        for(let i=0; i<initialRules.length; i++) {
+            randomizeRule(i); // 內部已包含重新渲染
+        }
+    }
+
     window.onGridTypeChange = function() {
-        const isHex = document.getElementById('gridType').value === 'hex';
+        const gridType = document.getElementById('gridType').value;
+        let maxTurn = gridType === 'hex' ? 5 : (gridType === 'square_4' ? 3 : 7);
         initialRules = getConfigFromUI();
         initialRules.forEach(r => {
-            let t = parseInt(r.turn);
-            if (isHex && t > 5) r.turn = '0'; // Hex最多到5，超出防呆
+            if (parseInt(r.turn) > maxTurn) r.turn = '0'; // 防呆歸零
         });
         renderRulesUI();
         fullReset();
@@ -508,7 +572,7 @@
     };
 
     document.getElementById('addRuleBtn').addEventListener('click', () => {
-        initialRules.push({ turn: '2', color: '#4da8da', logic: 'arpeggio', instrument: 'pluck', octave: '0' });
+        initialRules.push({ turn: '1', color: '#4da8da', logic: 'arpeggio', instrument: 'pluck', octave: '0', step: 1 });
         renderRulesUI(); fullReset();
     });
 
@@ -518,7 +582,8 @@
             color: row.querySelector('.rule-color').value,
             logic: row.querySelector('.rule-logic').value,
             instrument: row.querySelector('.rule-inst').value,
-            octave: row.querySelector('.rule-octave').value
+            octave: row.querySelector('.rule-octave').value,
+            step: row.querySelector('.rule-step').value
         }));
     }
 
@@ -553,7 +618,7 @@
         const savedData = localStorage.getItem('turmite_composer_save_' + slot);
         if (savedData) {
             const settings = JSON.parse(savedData);
-            document.getElementById('gridType').value = settings.gridType || 'square';
+            document.getElementById('gridType').value = settings.gridType || 'square_8';
             initialRules = settings.rules; renderRulesUI();
             document.getElementById('bpm').value = settings.bpm || 100;
             document.getElementById('musicKey').value = settings.musicKey || '62';
@@ -566,15 +631,11 @@
         }
     };
 
-    // --- 繪圖邏輯 (支援六角格) ---
+    // --- 繪圖邏輯 ---
     function drawHexagon(ctx, px, py, w, h, fillStyle, strokeStyle) {
         ctx.beginPath();
-        ctx.moveTo(px, py - h/2);
-        ctx.lineTo(px + w/2, py - h/4);
-        ctx.lineTo(px + w/2, py + h/4);
-        ctx.lineTo(px, py + h/2);
-        ctx.lineTo(px - w/2, py + h/4);
-        ctx.lineTo(px - w/2, py - h/4);
+        ctx.moveTo(px, py - h/2); ctx.lineTo(px + w/2, py - h/4); ctx.lineTo(px + w/2, py + h/4);
+        ctx.lineTo(px, py + h/2); ctx.lineTo(px - w/2, py + h/4); ctx.lineTo(px - w/2, py - h/4);
         ctx.closePath();
         if (fillStyle) { ctx.fillStyle = fillStyle; ctx.fill(); }
         if (strokeStyle) { ctx.strokeStyle = strokeStyle; ctx.lineWidth = 0.5; ctx.stroke(); }
@@ -585,14 +646,11 @@
         const color = rulesData[stateIndex] ? rulesData[stateIndex].color : '#000';
         
         if (gridType === 'hex') {
-            let w = canvas.width / gridSize;
-            let h = canvas.height / (gridSize * 0.75 + 0.25);
-            let px = x * w + (y % 2 !== 0 ? w/2 : 0) + w/2;
-            let py = y * (h * 0.75) + h/2;
+            let w = canvas.width / gridSize; let h = canvas.height / (gridSize * 0.75 + 0.25);
+            let px = x * w + (y % 2 !== 0 ? w/2 : 0) + w/2; let py = y * (h * 0.75) + h/2;
             drawHexagon(ctx, px, py, w + 0.5, h + 0.5, color, null);
         } else {
-            ctx.fillStyle = color;
-            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+            ctx.fillStyle = color; ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
         }
     }
 
@@ -600,10 +658,8 @@
         const gridType = document.getElementById('gridType').value;
         ctx.fillStyle = '#ff0000'; 
         if (gridType === 'hex') {
-            let w = canvas.width / gridSize;
-            let h = canvas.height / (gridSize * 0.75 + 0.25);
-            let px = antX * w + (antY % 2 !== 0 ? w/2 : 0) + w/2;
-            let py = antY * (h * 0.75) + h/2;
+            let w = canvas.width / gridSize; let h = canvas.height / (gridSize * 0.75 + 0.25);
+            let px = antX * w + (antY % 2 !== 0 ? w/2 : 0) + w/2; let py = antY * (h * 0.75) + h/2;
             ctx.beginPath(); ctx.arc(px, py, w * 0.4, 0, 2*Math.PI); ctx.fill();
         } else {
             ctx.fillRect(antX * cellSize + 2, antY * cellSize + 2, cellSize - 4, cellSize - 4);
@@ -623,12 +679,10 @@
         if (document.getElementById('showGrid').checked) {
             const strokeColor = document.getElementById('gridColor').value;
             if (gridType === 'hex') {
-                let w = canvas.width / gridSize;
-                let h = canvas.height / (gridSize * 0.75 + 0.25);
+                let w = canvas.width / gridSize; let h = canvas.height / (gridSize * 0.75 + 0.25);
                 for (let y = 0; y < gridSize; y++) {
                     for (let x = 0; x < gridSize; x++) {
-                        let px = x * w + (y % 2 !== 0 ? w/2 : 0) + w/2;
-                        let py = y * (h * 0.75) + h/2;
+                        let px = x * w + (y % 2 !== 0 ? w/2 : 0) + w/2; let py = y * (h * 0.75) + h/2;
                         drawHexagon(ctx, px, py, w, h, null, strokeColor);
                     }
                 }
@@ -651,13 +705,14 @@
         if (currentState >= rulesData.length) currentState = 0; 
         let rule = rulesData[currentState];
 
-        if (playAudio) playTone(rule.logic, rule.instrument, antX, antY, currentStepCount, rule.octave);
+        if (playAudio) playTone(rule.logic, rule.instrument, antX, antY, currentStepCount, rule.octave, rule.step);
 
         const gridType = document.getElementById('gridType').value;
         let turnVal = parseInt(rule.turn);
 
         // 轉向邏輯
         if (gridType === 'hex') direction = (direction + turnVal) % 6;
+        else if (gridType === 'square_4') direction = (direction + turnVal) % 4;
         else direction = (direction + turnVal) % 8;
 
         let nextState = (currentState + 1) % rulesData.length;
@@ -670,9 +725,12 @@
                 [ [1, 0], [1, 1], [0, 1], [-1, 0], [0, -1], [1, -1] ] : 
                 [ [1, 0], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1] ];
             antX += dirs[direction][0]; antY += dirs[direction][1];
+        } else if (gridType === 'square_4') {
+            const sq4Dirs = [ [0,-1], [1,0], [0,1], [-1,0] ]; // 上,右,下,左
+            antX += sq4Dirs[direction][0]; antY += sq4Dirs[direction][1];
         } else {
-            const sqDirs = [ [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
-            antX += sqDirs[direction][0]; antY += sqDirs[direction][1];
+            const sq8Dirs = [ [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
+            antX += sq8Dirs[direction][0]; antY += sq8Dirs[direction][1];
         }
 
         antX = (antX + gridSize) % gridSize; antY = (antY + gridSize) % gridSize;
