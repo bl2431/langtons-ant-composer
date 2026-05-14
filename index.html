@@ -18,6 +18,7 @@
             background-color: #ffffff; box-shadow: 0 0 25px rgba(0,0,0,0.9); 
             border: 1px solid #444; border-radius: 4px; 
             width: 100%; max-width: 800px; height: auto; aspect-ratio: 1 / 1; 
+            cursor: crosshair; 
         }
 
         @media (min-width: 1024px) {
@@ -44,7 +45,7 @@
         .btn-primary:hover { background-color: #ff5c77; box-shadow: 0 0 10px #e94560; }
         .btn-secondary { background-color: #4da8da; font-size: 16px; flex: 1; min-width: 100px; }
         .btn-secondary:hover { background-color: #62baf0; }
-        .btn-danger { background-color: #533440; border: 1px solid #e94560; font-size: 16px; flex: 1; min-width: 100px; }
+        .btn-danger { background-color: #533440; border: 1px solid #e94560; font-size: 15px; flex: 1; min-width: 100px; }
         .btn-danger:hover { background-color: #e94560; }
         .btn-random { background-color: #8e44ad; font-size: 16px; flex: 1; min-width: 100px; }
         .btn-random:hover { background-color: #9b59b6; box-shadow: 0 0 10px #8e44ad; }
@@ -78,13 +79,11 @@
             <summary>ℹ️ 這是什麼？該如何操作？ (點擊展開說明)</summary>
             <div class="info-content">
                 <strong>🐜 什麼是蘭頓螞蟻？</strong><br>
-                它是在網格上依簡單規則轉向、塗色的虛擬機器。會在短暫混亂後，創造出對稱且無限延伸的幾何圖形。<br><br>
+                它是在網格上依簡單規則轉向、塗色的虛擬機器。會在短暫混亂後創造出對稱的幾何圖形。<br><br>
                 <strong>🎯 創作理念：</strong><br>
-                將這份「混沌中的秩序」視覺轉化為音樂！讓使用者透過調整參數，體驗細胞自動機與演算法作曲的聽覺碰撞。<br><br>
-                <strong>🕹️ 操作與隱藏玩法：</strong><br>
-                1. <b>定調與編制：</b>設定起始音、調式、網格與各顏色的專屬樂器。<br>
-                2. <b>匯入照片：</b>在「視覺引擎設定」中上傳喜歡的照片，程式會將其轉換為你的狀態像素畫！<br>
-                3. <b>開演：</b>點擊「▶️ 播放」，戴上耳機享受這場演算法音樂秀！
+                將這份視覺秩序轉化為音樂！讓使用者體驗細胞自動機與演算法作曲的聽覺碰撞。<br><br>
+                <strong>🕹️ 隱藏玩法：</strong><br>
+                上傳你喜歡的「圖片」，程式會依據亮度將圖片轉成像素藝術，讓螞蟻在你的照片上進行二次創作！
             </div>
         </details>
 
@@ -93,7 +92,8 @@
         <div class="global-controls">
             <button id="startBtn" class="btn-primary">▶️ 播放</button>
             <button id="stepBtn" class="btn-secondary">⏭ 單步打拍</button>
-            <button id="resetBtn" class="btn-danger">🔄 歸零重奏</button>
+            <button id="resetBtn" class="btn-danger">🔄 歸零 (保留照片)</button>
+            <button id="clearAllBtn" class="btn-danger" style="background-color: #c0392b;">🗑️ 清空畫布 (重置)</button>
             <button id="randomAllBtn" class="btn-random" onclick="randomizeAllRules()">🎲 一鍵全隨機</button>
         </div>
 
@@ -146,7 +146,7 @@
                         <option value="hex">六角蜂巢 (6方向)</option>
                     </select>
                 </label>
-                <label>高速運算: <input type="number" id="stepsPerFrame" value="1" min="1" style="width: 60px;"> 步/幀</label>
+                <label>高速運算: <input type="number" id="stepsPerFrame" value="1" min="1" style="width: 50px;"> 步/幀</label>
             </div>
             
             <div class="flex-row" style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
@@ -155,19 +155,21 @@
             </div>
 
             <div class="flex-row" style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
-                <label>螞蟻數量: <input type="number" id="antCount" value="1" min="1" max="100" style="width: 60px;" onchange="placeAnts()"></label>
-                <label>放置方式: 
+                <label>螞蟻數量: <input type="number" id="antCount" value="1" min="1" max="100" style="width: 50px;" onchange="placeAnts()"></label>
+                <label>放置: 
                     <select id="antPlacement" onchange="placeAnts()">
                         <option value="center">正中央 (預設)</option>
                         <option value="random">隨機分散</option>
                         <option value="manual">手動點擊畫布</option>
                     </select>
                 </label>
+                <button class="btn-secondary" style="flex:none; padding: 6px 10px; font-size: 13px;" onclick="placeAnts()">🔄 重放螞蟻</button>
             </div>
 
             <div class="flex-row" style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
-                <label style="color:#a8dadd;">🖼️ 匯入照片(像素化): <input type="file" id="imageUpload" accept="image/*" style="width: 180px;"></label>
-                <button id="applyImageBtn" class="btn-secondary" style="flex:none; padding: 6px 10px; font-size: 13px; background-color:#8e44ad;">套用照片底色</button>
+                <label style="color:#a8dadd;">🖼️ 匯入照片: <input type="file" id="imageUpload" accept="image/*" style="width: 170px;"></label>
+                <button id="applyImageBtn" class="btn-secondary" style="flex:none; padding: 6px 10px; font-size: 13px; background-color:#8e44ad;">✨ 套用照片底色</button>
+                <button id="removeImageBtn" class="btn-danger" style="flex:none; padding: 6px 10px; font-size: 13px; background-color:#c0392b;">❌ 不用照片</button>
             </div>
 
             <div class="flex-row" style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
@@ -423,6 +425,10 @@
     const cellSize = canvas.width / gridSize;
     let grid = [], ants = [], isRunning = false, animationId = null, lastStepTime = 0, currentStepCount = 0, rulesData = []; 
 
+    // ✅ 新增照片使用標記
+    let uploadedImage = null;
+    let isUsingImage = false;
+
     let initialRules = [
         { turn: '1', color: '#1a1a2e', logic: 'chord_root', instrument: 'snare', octave: '0', step: 1 }, 
         { turn: '3', color: '#e94560', logic: 'y_axis', instrument: 'xylophone', octave: '0', step: 1 },
@@ -593,6 +599,7 @@
     function updateRulesData() {
         rulesData = getConfigFromUI();
         document.querySelectorAll('.rule-row').forEach((row, i) => row.style.borderLeftColor = rulesData[i].color);
+        // ✅ 修正：更改顏色時立刻重繪畫面
         if (!isRunning) drawFullGrid(); 
     }
 
@@ -639,14 +646,15 @@
     };
 
     // 📸 匯入照片邏輯
-    let uploadedImage = null;
     document.getElementById('imageUpload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function(event) {
             uploadedImage = new Image();
-            uploadedImage.onload = function() { applyImageToGrid(); }
+            uploadedImage.onload = function() { 
+                // 照片讀取完成，但不直接套用，等使用者按按鈕
+            }
             uploadedImage.src = event.target.result;
         }
         reader.readAsDataURL(file);
@@ -654,9 +662,19 @@
 
     document.getElementById('applyImageBtn').addEventListener('click', applyImageToGrid);
 
+    document.getElementById('removeImageBtn').addEventListener('click', () => {
+        isUsingImage = false;
+        uploadedImage = null;
+        document.getElementById('imageUpload').value = '';
+        clearGrid();
+    });
+
     function applyImageToGrid() {
-        if (!uploadedImage) return alert("請先點擊左方按鈕選擇一張照片！");
+        if (!uploadedImage) return alert("請先點擊左方按鈕選擇一張照片檔案！");
+        updateRulesData(); // 確保讀到最新的狀態與顏色
         if (rulesData.length === 0) return;
+        
+        isUsingImage = true;
         
         // 將照片畫到隱藏的 Canvas 上來取樣像素
         const offCanvas = document.createElement('canvas');
@@ -680,15 +698,24 @@
             }
         }
         currentStepCount = 0;
-        placeAnts(); // 會自動重新繪製畫布
+        placeAnts(); // 會自動重新繪製畫布，瞬間套用！
     }
 
+    function clearGrid() {
+        isUsingImage = false;
+        grid = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
+        currentStepCount = 0;
+        placeAnts();
+    }
+
+    // --- 繪圖邏輯 ---
     function drawHexagon(ctx, px, py, w, h, fillStyle, strokeStyle) {
         ctx.beginPath();
         ctx.moveTo(px, py - h/2); ctx.lineTo(px + w/2, py - h/4); ctx.lineTo(px + w/2, py + h/4);
         ctx.lineTo(px, py + h/2); ctx.lineTo(px - w/2, py + h/4); ctx.lineTo(px - w/2, py - h/4);
         ctx.closePath();
         if (fillStyle) { ctx.fillStyle = fillStyle; ctx.fill(); }
+        // ✅ 修正：網格線條強化
         if (strokeStyle) { ctx.strokeStyle = strokeStyle; ctx.lineWidth = 1; ctx.stroke(); }
     }
 
@@ -724,14 +751,17 @@
         const gridType = document.getElementById('gridType').value;
         const bgColor = rulesData[0] ? rulesData[0].color : '#FFFFFF';
         
+        // 填滿底色
         ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
         
+        // 畫所有方塊/六角塊
         for (let y = 0; y < gridSize; y++) {
             for (let x = 0; x < gridSize; x++) { 
                 if (grid[y][x] !== 0) drawCell(x, y, grid[y][x]); 
             }
         }
 
+        // ✅ 修正：把網格線畫在所有顏色的最上層，確保絕不消失
         if (document.getElementById('showGrid').checked) {
             const strokeColor = document.getElementById('gridColor').value;
             if (gridType === 'hex') {
@@ -838,7 +868,7 @@
                     [ [1, 0], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1] ];
                 ant.x += dirs[ant.dir][0]; ant.y += dirs[ant.dir][1];
             } else if (gridType === 'square_4') {
-                const sq4Dirs = [ [0,-1], [1,0], [0,1], [-1,0] ];
+                const sq4Dirs = [ [0,-1], [1,0], [0,1], [-1,0] ]; // 上 右 下 左
                 ant.x += sq4Dirs[ant.dir][0]; ant.y += sq4Dirs[ant.dir][1];
             } else {
                 const sq8Dirs = [ [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
@@ -877,11 +907,18 @@
         document.getElementById('startBtn').innerHTML = '▶️ 播放'; 
         cancelAnimationFrame(animationId);
         
-        grid = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
         currentStepCount = 0;
+        document.getElementById('stepCounterDisplay').innerText = `目前步數: 0`; 
         
         updateRulesData(); 
-        placeAnts(); 
+        
+        // 🔄 歸零重奏：如果正在使用照片，就重畫照片，否則清空
+        if (isUsingImage && uploadedImage) {
+            applyImageToGrid(); 
+        } else {
+            grid = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
+            placeAnts(); 
+        }
     }
 
     document.getElementById('startBtn').addEventListener('click', () => {
@@ -910,8 +947,11 @@
         document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
     });
 
+    // 分離兩顆按鈕的邏輯
     document.getElementById('resetBtn').addEventListener('click', fullReset);
+    document.getElementById('clearAllBtn').addEventListener('click', clearGrid);
 
+    // --- 啟動 ---
     renderRulesUI();
     checkSaveSlots(); 
     fullReset(); 
