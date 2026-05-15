@@ -111,7 +111,7 @@
                 <button class="btn-random" style="background-color: #ff6b6b; color: #12121e;" onclick="loadPreset(5)">🎵 範例 5：王道史詩</button>
                 <button class="btn-random" style="background-color: #54a0ff; color: #12121e;" onclick="loadPreset(6)">🎵 範例 6：藍調公路</button>
             </div>
-            <p style="font-size: 11px; color: #aaa; margin: 8px 0 0 0;">💡 點擊會自動為你配置最和諧的音階與絕對對稱的轉向演算法！</p>
+            <p style="font-size: 11px; color: #aaa; margin: 8px 0 0 0;">💡 點擊會自動為你配置完美對稱的轉向演算法與極致和諧的音樂調性！</p>
         </div>
 
         <div class="control-group" style="border-color: #f9a826;">
@@ -153,7 +153,7 @@
         </div>
 
         <div class="control-group">
-            <h3 style="color: #4da8da; border-color: #4da8da;">⏱️ 視覺引擎與配置設定</h3>
+            <h3>⏱️ 視覺引擎與配置設定</h3>
             
             <div class="flex-row">
                 <label>網格類型: 
@@ -196,12 +196,12 @@
             </div>
         </div>
 
-        <h3 style="color: #4da8da; border-color: #4da8da; margin-top: 20px;">📝 樂團編制與狀態規則 (狀態 0 為背景底色)</h3>
+        <h3>📝 樂團編制與狀態規則 (狀態 0 為背景底色)</h3>
         <div id="rules-container"></div>
         <button id="addRuleBtn" class="btn-add">➕ 新增一個狀態 / 樂器</button>
 
         <div class="control-group" style="margin-top: 20px;">
-            <h3 style="color: #4da8da; border-color: #4da8da;">💾 記憶體與存檔</h3>
+            <h3>💾 記憶體與存檔</h3>
             <div style="display: flex; gap: 5px; margin-bottom: 5px;">
                 <button onclick="saveSettings(1)" class="btn-save">📥 儲存 1</button>
                 <button onclick="saveSettings(2)" class="btn-save">📥 儲存 2</button>
@@ -448,7 +448,7 @@
 
     let initialRules = [];
 
-    // 🌟 核心：載入大師級範例資料
+    // 🌟 6組極致對稱與純淨和諧範例配置
     function applyPresetData(num) {
         if (isRunning) document.getElementById('startBtn').click();
         isUsingImage = false;
@@ -456,9 +456,9 @@
         document.getElementById('imageUpload').value = '';
 
         if (num === 1) {
-            // 範例 1：曼陀羅舞曲 (保留你的最愛)
+            // 範例 1：曼陀羅舞 (萬花筒對稱)
             document.getElementById('gridType').value = 'square_4';
-            document.getElementById('musicKey').value = '69';
+            document.getElementById('musicKey').value = '69'; // A
             document.getElementById('musicScale').value = 'minor';
             document.getElementById('chordProgression').value = '6415';
             document.getElementById('bpm').value = '130';
@@ -471,22 +471,22 @@
                 { turn: '3', color: '#ffa502', logic: 'chord_fifth', instrument: 'bass', octave: '-1', step: 1 }
             ];
         } else if (num === 2) {
-            // 範例 2：星空迴旋 (美麗的六角雪花)
+            // 範例 2：星空迴旋 (完美六角雪花 + 空靈大調豎琴)
             document.getElementById('gridType').value = 'hex';
-            document.getElementById('musicKey').value = '65'; // F
-            document.getElementById('musicScale').value = 'major';
-            document.getElementById('chordProgression').value = '1564';
-            document.getElementById('bpm').value = '140';
+            document.getElementById('musicKey').value = '64'; // E
+            document.getElementById('musicScale').value = 'pentatonic';
+            document.getElementById('chordProgression').value = '1';
+            document.getElementById('bpm').value = '150';
             document.getElementById('antPlacement').value = 'center';
             document.getElementById('antCount').value = '1';
             initialRules = [
-                { turn: '1', color: '#2980b9', logic: 'chord_root', instrument: 'cello', octave: '-1', step: 1 },
-                { turn: '5', color: '#f1c40f', logic: 'arpeggio', instrument: 'harp', octave: '1', step: 1 },
-                { turn: '2', color: '#8e44ad', logic: 'y_axis', instrument: 'bell', octave: '2', step: 1 },
-                { turn: '4', color: '#27ae60', logic: 'chord_fifth', instrument: 'violin', octave: '0', step: 1 }
+                { turn: '1', color: '#0f2038', logic: 'chord_root', instrument: 'synth_pad', octave: '-1', step: 1 },
+                { turn: '5', color: '#4da8da', logic: 'arpeggio', instrument: 'harp', octave: '1', step: 1 },
+                { turn: '2', color: '#f1c40f', logic: 'random_scale', instrument: 'marimba', octave: '0', step: 1 },
+                { turn: '4', color: '#1abc9c', logic: 'chord_fifth', instrument: 'bell', octave: '1', step: 1 }
             ];
         } else if (num === 3) {
-            // 範例 3：五聲禪意 (空靈東方)
+            // 範例 3：五聲禪意 (十字鏡像對稱 + 東方極樂)
             document.getElementById('gridType').value = 'square_8';
             document.getElementById('musicKey').value = '60'; // C
             document.getElementById('musicScale').value = 'pentatonic';
@@ -495,63 +495,64 @@
             document.getElementById('antPlacement').value = 'symmetric';
             document.getElementById('antCount').value = '4';
             initialRules = [
-                { turn: '1', color: '#2c3e50', logic: 'chord_root', instrument: 'bass', octave: '-1', step: 1 },
-                { turn: '7', color: '#e74c3c', logic: 'arpeggio', instrument: 'marimba', octave: '0', step: 1 },
-                { turn: '2', color: '#ecf0f1', logic: 'x_axis', instrument: 'pluck', octave: '1', step: 1 }
+                { turn: '2', color: '#2c3e50', logic: 'chord_root', instrument: 'bass', octave: '-1', step: 1 },
+                { turn: '6', color: '#e74c3c', logic: 'arpeggio', instrument: 'marimba', octave: '0', step: 1 },
+                { turn: '2', color: '#ecf0f1', logic: 'x_axis', instrument: 'pluck', octave: '1', step: 1 },
+                { turn: '6', color: '#3498db', logic: 'chord_fifth', instrument: 'bell', octave: '0', step: 1 }
             ];
         } else if (num === 4) {
-            // 範例 4：爵士光譜
+            // 範例 4：爵士光譜 (Dorian 迷幻對稱)
             document.getElementById('gridType').value = 'square_4';
             document.getElementById('musicKey').value = '62'; // D
             document.getElementById('musicScale').value = 'dorian';
             document.getElementById('chordProgression').value = '2511';
-            document.getElementById('bpm').value = '150';
-            document.getElementById('antPlacement').value = 'center';
-            document.getElementById('antCount').value = '1';
-            initialRules = [
-                { turn: '1', color: '#16a085', logic: 'chord_root', instrument: 'organ', octave: '0', step: 1 },
-                { turn: '3', color: '#d35400', logic: 'arpeggio', instrument: 'xylophone', octave: '1', step: 1 },
-                { turn: '3', color: '#8e44ad', logic: 'y_axis', instrument: 'pluck', octave: '0', step: 1 },
-                { turn: '1', color: '#2980b9', logic: 'chord_fifth', instrument: 'bass', octave: '-1', step: 1 }
-            ];
-        } else if (num === 5) {
-            // 範例 5：王道史詩
-            document.getElementById('gridType').value = 'hex';
-            document.getElementById('musicKey').value = '67'; // G
-            document.getElementById('musicScale').value = 'major';
-            document.getElementById('chordProgression').value = '4536';
-            document.getElementById('bpm').value = '120';
+            document.getElementById('bpm').value = '135';
             document.getElementById('antPlacement').value = 'symmetric';
             document.getElementById('antCount').value = '4';
             initialRules = [
-                { turn: '1', color: '#34495e', logic: 'chord_root', instrument: 'synth_pad', octave: '0', step: 1 },
-                { turn: '2', color: '#1abc9c', logic: 'arpeggio', instrument: 'harp', octave: '1', step: 1 },
-                { turn: '4', color: '#e67e22', logic: 'y_axis', instrument: 'violin', octave: '0', step: 1 }
+                { turn: '1', color: '#16a085', logic: 'chord_root', instrument: 'organ', octave: '0', step: 1 },
+                { turn: '3', color: '#d35400', logic: 'arpeggio', instrument: 'xylophone', octave: '1', step: 1 },
+                { turn: '1', color: '#8e44ad', logic: 'y_axis', instrument: 'pluck', octave: '0', step: 1 },
+                { turn: '3', color: '#2980b9', logic: 'chord_fifth', instrument: 'bass', octave: '-1', step: 1 }
+            ];
+        } else if (num === 5) {
+            // 範例 5：王道史詩 (經典 4-5-3-6 樂章 + 大合奏)
+            document.getElementById('gridType').value = 'square_4';
+            document.getElementById('musicKey').value = '67'; // G
+            document.getElementById('musicScale').value = 'major';
+            document.getElementById('chordProgression').value = '4536';
+            document.getElementById('bpm').value = '125';
+            document.getElementById('antPlacement').value = 'symmetric';
+            document.getElementById('antCount').value = '4';
+            initialRules = [
+                { turn: '1', color: '#218c74', logic: 'chord_root', instrument: 'cello', octave: '-1', step: 1 },
+                { turn: '3', color: '#fed330', logic: 'arpeggio', instrument: 'violin', octave: '1', step: 1 },
+                { turn: '1', color: '#b33939', logic: 'chord_third', instrument: 'organ', octave: '0', step: 1 },
+                { turn: '3', color: '#227093', logic: 'chord_fifth', instrument: 'harp', octave: '0', step: 1 }
             ];
         } else if (num === 6) {
-            // 範例 6：藍調公路
+            // 範例 6：藍調公路 (狂野飆車對稱)
             document.getElementById('gridType').value = 'square_8';
             document.getElementById('musicKey').value = '69'; // A
             document.getElementById('musicScale').value = 'blues';
             document.getElementById('chordProgression').value = '1';
-            document.getElementById('bpm').value = '200';
+            document.getElementById('bpm').value = '180';
             document.getElementById('antPlacement').value = 'symmetric';
             document.getElementById('antCount').value = '4';
             initialRules = [
-                { turn: '1', color: '#2c2c54', logic: 'chord_root', instrument: 'drum', octave: '0', step: 1 },
-                { turn: '3', color: '#ffb142', logic: 'x_axis', instrument: 'pluck', octave: '0', step: 1 },
-                { turn: '5', color: '#33d9b2', logic: 'arpeggio', instrument: 'square', octave: '1', step: 1 },
-                { turn: '7', color: '#ff5252', logic: 'random_scale', instrument: 'snare', octave: '0', step: 1 }
+                { turn: '2', color: '#2c2c54', logic: 'chord_root', instrument: 'drum', octave: '0', step: 1 },
+                { turn: '6', color: '#ffb142', logic: 'x_axis', instrument: 'pluck', octave: '0', step: 1 },
+                { turn: '2', color: '#33d9b2', logic: 'arpeggio', instrument: 'square', octave: '1', step: 1 },
+                { turn: '6', color: '#ff5252', logic: 'random_scale', instrument: 'snare', octave: '0', step: 1 }
             ];
         }
+
         renderRulesUI();
         fullReset();
     }
 
-    // 🌟 按鈕呼叫：一鍵載入
     window.loadPreset = function(num) {
         applyPresetData(num);
-        alert(`✅ 已為您載入「範例 ${num}」！請直接點擊「▶️ 播放」按鈕欣賞。`);
     }
 
     function getTurnHtml(rule, gridType) {
@@ -595,7 +596,6 @@
             row.className = 'rule-row';
             
             let turnHtml = `<select class="rule-turn" onchange="updateRulesData()">${getTurnHtml(rule, gridType)}</select>`;
-
             let logicHtml = `<select class="rule-logic" onchange="updateRuleDisables(); updateRulesData();">`;
             pitchLogicOptions.forEach(opt => logicHtml += `<option value="${opt.value}" ${rule.logic === opt.value ? 'selected' : ''}>${opt.label}</option>`);
             logicHtml += `</select>`;
@@ -637,7 +637,6 @@
         document.querySelectorAll('.rule-row').forEach(row => {
             let inst = row.querySelector('.rule-inst').value;
             let isPerc = ['drum','snare','hihat','cymbal'].includes(inst);
-            
             let logicSelect = row.querySelector('.rule-logic');
             let octaveSelect = row.querySelector('.rule-octave');
             let stepInput = row.querySelector('.rule-step');
@@ -762,7 +761,6 @@
         }
     };
 
-    // 📸 匯入照片邏輯
     document.getElementById('imageUpload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -808,13 +806,11 @@
         isUsingImage = false;
         uploadedImage = null;
         document.getElementById('imageUpload').value = '';
-        
         grid = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
         currentStepCount = 0;
         placeAnts();
     });
 
-    // --- 繪圖邏輯 ---
     function drawHexagon(ctx, px, py, w, h, fillStyle, strokeStyle) {
         ctx.beginPath();
         ctx.moveTo(px, py - h/2); ctx.lineTo(px + w/2, py - h/4); ctx.lineTo(px + w/2, py + h/4);
@@ -902,7 +898,7 @@
             }
             document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
         } else if (mode === 'symmetric') {
-            document.getElementById('antCount').value = 4; // 強制顯示 4 隻
+            document.getElementById('antCount').value = 4; 
             let c = Math.floor(gridSize/2);
             if (gridType === 'hex') {
                 ants.push({x: c-2, y: c-2, dir: 0}); ants.push({x: c+2, y: c-2, dir: 1});
@@ -956,7 +952,6 @@
 
     function executeStep(playAudio = true, renderImmediately = true) {
         if (rulesData.length === 0 || ants.length === 0) return;
-        
         const gridType = document.getElementById('gridType').value;
 
         for (let i = 0; i < ants.length; i++) {
@@ -984,7 +979,7 @@
                     [ [1, 0], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1] ];
                 ant.x += dirs[ant.dir][0]; ant.y += dirs[ant.dir][1];
             } else if (gridType === 'square_4') {
-                const sq4Dirs = [ [0,-1], [1,0], [0,1], [-1,0] ]; 
+                const sq4Dirs = [ [0,-1], [1,0], [0,1], [-1,0] ];
                 ant.x += sq4Dirs[ant.dir][0]; ant.y += sq4Dirs[ant.dir][1];
             } else {
                 const sq8Dirs = [ [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
@@ -1009,7 +1004,8 @@
             for (let i = 0; i < stepsPerFrame; i++) executeStep(false, i === stepsPerFrame - 1);
             document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
         } else {
-            if (timestamp - lastStepTime >= delayMs) {
+            // ✅ 修正：藉由 lastStepTime 為 0 判定首次播放，徹底解決啟動卡住與延遲問題
+            if (lastStepTime === 0 || timestamp - lastStepTime >= delayMs) {
                 executeStep(true, true);
                 document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
                 lastStepTime = timestamp;
@@ -1041,7 +1037,7 @@
         isRunning = !isRunning;
         document.getElementById('startBtn').innerHTML = isRunning ? '⏸ 暫停' : '▶️ 播放';
         if (isRunning) { 
-            lastStepTime = performance.now(); 
+            lastStepTime = 0; // ✅ 保證點擊播放時立即執行第一步，絕不拖泥帶水
             animationId = requestAnimationFrame(loop); 
         } 
         else cancelAnimationFrame(animationId);
@@ -1065,7 +1061,8 @@
     document.getElementById('resetBtn').addEventListener('click', fullReset);
     document.getElementById('clearAllBtn').addEventListener('click', () => { document.getElementById('removeImageBtn').click(); });
 
-    // --- 啟動預設值：直接載入範例 1 ---
+    // --- 🚀 完美初始化流程：啟動即載入最完美的範例 1 網格配置 ---
+    isUsingImage = false;
     applyPresetData(1);
 
 </script>
