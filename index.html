@@ -427,7 +427,6 @@
         } else if (instrument === 'bass') {
             const osc = audioCtx.createOscillator(); osc.type = 'triangle'; osc.frequency.setValueAtTime(freq, t);
             osc.connect(masterGain);
-            // 🐛 ✅ 已移除原本導致第16步崩潰的 ants.push 錯誤行！
             masterGain.gain.setValueAtTime(0.8, t); masterGain.gain.exponentialRampToValueAtTime(0.01, t + noteDuration);
             osc.start(t); osc.stop(t + noteDuration);
         } else {
@@ -443,7 +442,7 @@
     const gridSize = 100; 
     const cellSize = canvas.width / gridSize;
     
-    // ✅ 關鍵初始化修復：確保網格矩陣一開始就是就緒狀態
+    // ✅ 核心初始化修復：確保網格矩陣一開始就是就緒狀態
     let grid = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
     let ants = [], isRunning = false, animationId = null, lastStepTime = 0, currentStepCount = 0, rulesData = []; 
 
@@ -452,7 +451,7 @@
 
     let initialRules = [];
 
-    // 🌟 6 組完全不重複、完美幾何對稱與絕對和諧的音階範例
+    // 🌟 6 組形狀各自獨立、完美幾何對稱與絕對和諧的音階範例
     function applyPresetData(num) {
         if (isRunning) document.getElementById('startBtn').click();
         isUsingImage = false;
@@ -475,22 +474,22 @@
                 { turn: '3', color: '#ffa502', logic: 'chord_fifth', instrument: 'bass', octave: '-1', step: 1 }
             ];
         } else if (num === 2) {
-            // 範例 2：星空迴旋 (六角蜂巢，完美螺旋雪花圖形)
+            // 範例 2：星空迴旋 (六角蜂巢，完美螺旋冰晶雪花圖形)
             document.getElementById('gridType').value = 'hex';
             document.getElementById('musicKey').value = '64'; // E
-            document.getElementById('musicScale').value = 'pentatonic';
+            document.getElementById('musicScale').value = 'major';
             document.getElementById('chordProgression').value = '1';
             document.getElementById('bpm').value = '150';
             document.getElementById('antPlacement').value = 'center';
             document.getElementById('antCount').value = '1';
             initialRules = [
                 { turn: '1', color: '#0f2038', logic: 'chord_root', instrument: 'synth_pad', octave: '-1', step: 1 },
-                { turn: '5', color: '#4da8da', logic: 'arpeggio', instrument: 'harp', octave: '1', step: 1 },
-                { turn: '2', color: '#f1c40f', logic: 'random_scale', instrument: 'marimba', octave: '0', step: 1 },
+                { turn: '4', color: '#4da8da', logic: 'arpeggio', instrument: 'harp', octave: '1', step: 1 },
+                { turn: '1', color: '#f1c40f', logic: 'random_scale', instrument: 'marimba', octave: '0', step: 1 },
                 { turn: '4', color: '#1abc9c', logic: 'chord_fifth', instrument: 'bell', octave: '1', step: 1 }
             ];
         } else if (num === 3) {
-            // 範例 3：五聲禪意 (方格 8方向，全新 45° 斜向鑽石流星對稱，絕不與範例1重複)
+            // 範例 3：五聲禪意 (方格 8方向，45° 斜向鑽石流星編織對稱，絕不與範例1重複)
             document.getElementById('gridType').value = 'square_8';
             document.getElementById('musicKey').value = '60'; // C
             document.getElementById('musicScale').value = 'pentatonic';
@@ -505,7 +504,7 @@
                 { turn: '7', color: '#3498db', logic: 'chord_fifth', instrument: 'bell', octave: '0', step: 1 }
             ];
         } else if (num === 4) {
-            // 範例 4：水晶迷宮 (方格 4方向，全新 1,2,3 週期迴圈轉向，長出完美四方擴張的宮殿迷宮，管弦樂大調進行)
+            // 範例 4：水晶迷宮 (方格 4方向，長出完美四方框擴張的城堡城牆迷宮)
             document.getElementById('gridType').value = 'square_4';
             document.getElementById('musicKey').value = '60'; // C
             document.getElementById('musicScale').value = 'major';
@@ -520,34 +519,34 @@
                 { turn: '1', color: '#4bcffa', logic: 'chord_fifth', instrument: 'cello', octave: '-1', step: 1 }
             ];
         } else if (num === 5) {
-            // 範例 5：蜂巢幾何 (六角蜂巢，4隻螞蟻大團編制，利用 1,3,5 對稱角度形成萬花筒般的六角蜂巢晶體網格)
+            // 範例 5：蜂巢幾何 (六角蜂巢，4隻螞蟻大團編制，高密度蜂巢實心晶體網格，與範例2徹底區隔)
             document.getElementById('gridType').value = 'hex';
-            document.getElementById('musicKey').value = '64'; // E
+            document.getElementById('musicKey').value = '67'; // G
             document.getElementById('musicScale').value = 'major';
-            document.getElementById('chordProgression').value = '1645';
+            document.getElementById('chordProgression').value = '1564';
             document.getElementById('bpm').value = '125';
             document.getElementById('antPlacement').value = 'symmetric';
             document.getElementById('antCount').value = '4';
             initialRules = [
-                { turn: '1', color: '#34495e', logic: 'chord_root', instrument: 'bass', octave: '-1', step: 1 },
+                { turn: '2', color: '#34495e', logic: 'chord_root', instrument: 'bass', octave: '-1', step: 1 },
                 { turn: '3', color: '#1abc9c', logic: 'arpeggio', instrument: 'harp', octave: '1', step: 1 },
                 { turn: '5', color: '#e67e22', logic: 'y_axis', instrument: 'violin', octave: '0', step: 2 },
                 { turn: '1', color: '#2ecc71', logic: 'chord_fifth', instrument: 'synth_pad', octave: '0', step: 1 }
             ];
         } else if (num === 6) {
-            // 範例 6：時空碎形 (方格 8方向，利用 2,4,6 大角度迴旋規則，在畫布四角長出完美鏡像的巨大碎形樹枝)
+            // 範例 6：時空碎形 (方格 8方向，全新 90度與大斜角複合，在畫布中央炸開一個對稱的「八角雷達星芒網」，藍調慵懶和聲)
             document.getElementById('gridType').value = 'square_8';
             document.getElementById('musicKey').value = '62'; // D
-            document.getElementById('musicScale').value = 'minor';
-            document.getElementById('chordProgression').value = '6415';
-            document.getElementById('bpm').value = '135';
+            document.getElementById('musicScale').value = 'blues';
+            document.getElementById('chordProgression').value = '1';
+            document.getElementById('bpm').value = '145';
             document.getElementById('antPlacement').value = 'symmetric';
             document.getElementById('antCount').value = '4';
             initialRules = [
                 { turn: '2', color: '#222f3e', logic: 'chord_root', instrument: 'drum', octave: '0', step: 1 },
-                { turn: '4', color: '#ff9f43', logic: 'x_axis', instrument: 'pluck', octave: '1', step: 2 },
-                { turn: '6', color: '#0abde3', logic: 'arpeggio', instrument: 'square', octave: '0', step: 1 },
-                { turn: '2', color: '#ee5253', logic: 'chord_third', instrument: 'synth_pad', octave: '0', step: 1 }
+                { turn: '5', color: '#ff9f43', logic: 'x_axis', instrument: 'pluck', octave: '1', step: 2 },
+                { turn: '2', color: '#0abde3', logic: 'arpeggio', instrument: 'square', octave: '0', step: 1 },
+                { turn: '5', color: '#ee5253', logic: 'chord_third', instrument: 'synth_pad', octave: '0', step: 1 }
             ];
         }
 
@@ -1051,7 +1050,7 @@
         initAudio(); 
         if (isRunning) document.getElementById('startBtn').click();
         executeStep(true, true); 
-        document.getElementById('stepCounterDisplay').innerText = `目前步數: ${currentStepCount}`;
+        document.getElementById('stepCounterDisplay').innerText = `目の前步數: ${currentStepCount}`;
     });
 
     document.getElementById('jumpBtn').addEventListener('click', () => {
