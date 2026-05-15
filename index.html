@@ -47,7 +47,7 @@
         .btn-secondary:hover { background-color: #62baf0; }
         .btn-danger { background-color: #533440; border: 1px solid #e94560; font-size: 15px; flex: 1; min-width: 100px; }
         .btn-danger:hover { background-color: #e94560; }
-        .btn-random { background-color: #8e44ad; font-size: 14px; flex: 1; min-width: 100px; }
+        .btn-random { background-color: #8e44ad; font-size: 14px; flex: 1; min-width: 100px; padding: 8px 5px;}
         .btn-random:hover { background-color: #9b59b6; box-shadow: 0 0 10px #8e44ad; }
         
         .btn-add { background-color: transparent; border: 1px dashed #e94560; width: 100%; margin-top: 5px; color: #e94560; padding: 12px; font-size: 15px; }
@@ -59,7 +59,7 @@
         .btn-load { background-color: #2a3b5c; font-size: 13px; padding: 8px; flex: 1; text-align: center; }
         .btn-load:disabled { background-color: #555; cursor: not-allowed; opacity: 0.5; }
         
-        .flex-row { display: flex; gap: 15px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .flex-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
         .step-display { font-size: 24px; font-weight: bold; color: #f9a826; text-align: center; margin-bottom: 15px; letter-spacing: 2px; }
         
         .info-box { font-size: 12px; color: #a0b2c6; margin-bottom: 15px; background: #0f2038; padding: 8px 12px; border-radius: 6px; border: 1px dashed #4da8da; }
@@ -94,18 +94,24 @@
         <div class="global-controls">
             <button id="startBtn" class="btn-primary">▶️ 播放</button>
             <button id="stepBtn" class="btn-secondary">⏭ 單步打拍</button>
-            <button id="resetBtn" class="btn-danger">🔄 歸零 (保留照片)</button>
-            <button id="randomAllBtn" class="btn-random" onclick="randomizeAllRules()">🎲 一鍵全隨機</button>
+            <button id="resetBtn" class="btn-danger">🔄 歸零</button>
+            <button id="clearAllBtn" class="btn-danger" style="background-color: #c0392b;">🗑️ 清空畫布</button>
+            <button id="randomAllBtn" class="btn-random" onclick="randomizeAllRules()" style="background-color: #8e44ad;">🎲 一鍵全隨機</button>
         </div>
 
         <div class="control-group" style="border-color: #8e44ad; background-color: #1a0b2e;">
-            <h3 style="color: #e056fd; border-color: #e056fd;">🌟 大師級推薦範例 (一鍵載入)</h3>
+            <h3 style="color: #e056fd; border-color: #e056fd;">🌟 範例 (一鍵載入)</h3>
             <div class="flex-row">
-                <button class="btn-random" style="background-color: #f368e0; color: #12121e;" onclick="loadPreset(1)">🎵 範例一：繽紛四向</button>
-                <button class="btn-random" style="background-color: #48dbfb; color: #12121e;" onclick="loadPreset(2)">🎵 範例二：六角雪花</button>
-                <button class="btn-random" style="background-color: #1dd1a1; color: #12121e;" onclick="loadPreset(3)">🎵 範例三：曼陀羅舞曲</button>
+                <button class="btn-random" style="background-color: #f368e0; color: #12121e;" onclick="loadPreset(1)">🎵 範例 1：曼陀羅舞</button>
+                <button class="btn-random" style="background-color: #48dbfb; color: #12121e;" onclick="loadPreset(2)">🎵 範例 2：星空迴旋</button>
+                <button class="btn-random" style="background-color: #1dd1a1; color: #12121e;" onclick="loadPreset(3)">🎵 範例 3：五聲禪意</button>
             </div>
-            <p style="font-size: 11px; color: #aaa; margin: 5px 0 0 0;">💡 點擊後會自動覆蓋目前的設定，立刻為你展示最和諧美麗的演算法音樂！</p>
+            <div class="flex-row">
+                <button class="btn-random" style="background-color: #feca57; color: #12121e;" onclick="loadPreset(4)">🎵 範例 4：爵士光譜</button>
+                <button class="btn-random" style="background-color: #ff6b6b; color: #12121e;" onclick="loadPreset(5)">🎵 範例 5：王道史詩</button>
+                <button class="btn-random" style="background-color: #54a0ff; color: #12121e;" onclick="loadPreset(6)">🎵 範例 6：藍調公路</button>
+            </div>
+            <p style="font-size: 11px; color: #aaa; margin: 8px 0 0 0;">💡 點擊會自動為你配置最和諧的音階與絕對對稱的轉向演算法！</p>
         </div>
 
         <div class="control-group" style="border-color: #f9a826;">
@@ -114,7 +120,7 @@
                 <label>起始音 (Key): 
                     <select id="musicKey">
                         <option value="60">C</option><option value="61">C# / Db</option>
-                        <option value="62" selected>D</option><option value="63">D# / Eb</option>
+                        <option value="62">D</option><option value="63">D# / Eb</option>
                         <option value="64">E</option><option value="65">F</option>
                         <option value="66">F# / Gb</option><option value="67">G</option>
                         <option value="68">G# / Ab</option><option value="69">A</option>
@@ -127,7 +133,7 @@
                         <option value="minor">自然小調 (Minor)</option>
                         <option value="pentatonic">五聲音階 (Pentatonic)</option>
                         <option value="dorian">多利安 (Dorian)</option>
-                        <option value="blues" selected>藍調 (Blues)</option>
+                        <option value="blues">藍調 (Blues)</option>
                     </select>
                 </label>
             </div>
@@ -138,11 +144,11 @@
                         <option value="1564">流行史詩 (1-5-6-4)</option>
                         <option value="1645">經典流行 (1-6-4-5)</option>
                         <option value="6415">史詩懸疑 (6-4-1-5)</option>
-                        <option value="2511" selected>爵士進行 (2-5-1-1)</option>
+                        <option value="2511">爵士進行 (2-5-1-1)</option>
                         <option value="4536">王道進行 (4-5-3-6)</option>
                     </select>
                 </label>
-                <label>速度 (BPM): <input type="number" id="bpm" value="100" min="40" max="800"></label>
+                <label>速度 (BPM): <input type="number" id="bpm" value="130" min="40" max="800"></label>
             </div>
         </div>
 
@@ -153,7 +159,7 @@
                 <label>網格類型: 
                     <select id="gridType" onchange="onGridTypeChange()" style="background-color: #1a1a2e; font-weight:bold; color:#4da8da;">
                         <option value="square_4">方格 (4方向)</option>
-                        <option value="square_8" selected>方格 (8方向斜角)</option>
+                        <option value="square_8">方格 (8方向斜角)</option>
                         <option value="hex">六角蜂巢 (6方向)</option>
                     </select>
                 </label>
@@ -166,7 +172,7 @@
             </div>
 
             <div class="flex-row" style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
-                <label>螞蟻數量: <input type="number" id="antCount" value="1" min="1" max="100" style="width: 50px;" onchange="placeAnts()"></label>
+                <label>螞蟻數量: <input type="number" id="antCount" value="4" min="1" max="100" style="width: 50px;" onchange="placeAnts()"></label>
                 <label>放置方式: 
                     <select id="antPlacement" onchange="placeAnts()">
                         <option value="center">正中央 (預設)</option>
@@ -437,63 +443,22 @@
     const cellSize = canvas.width / gridSize;
     let grid = [], ants = [], isRunning = false, animationId = null, lastStepTime = 0, currentStepCount = 0, rulesData = []; 
 
-    // ✅ 圖片標記，預設為不使用
     let uploadedImage = null;
     let isUsingImage = false;
 
-    let initialRules = [
-        { turn: '1', color: '#1a1a2e', logic: 'chord_root', instrument: 'snare', octave: '0', step: 1 }, 
-        { turn: '3', color: '#e94560', logic: 'y_axis', instrument: 'xylophone', octave: '0', step: 1 },
-        { turn: '3', color: '#f9a826', logic: 'arpeggio', instrument: 'square', octave: '0', step: 1 },
-        { turn: '1', color: '#27ae60', logic: 'x_axis', instrument: 'drum', octave: '0', step: 1 }
-    ];
+    let initialRules = [];
 
-    // 🌟 一鍵載入大師級範例
-    window.loadPreset = function(num) {
+    // 🌟 核心：載入大師級範例資料
+    function applyPresetData(num) {
         if (isRunning) document.getElementById('startBtn').click();
-        
         isUsingImage = false;
         uploadedImage = null;
         document.getElementById('imageUpload').value = '';
 
         if (num === 1) {
-            // 範例一：繽紛四向 (Colorful 4-Dir Highway)
+            // 範例 1：曼陀羅舞曲 (保留你的最愛)
             document.getElementById('gridType').value = 'square_4';
-            document.getElementById('musicKey').value = '60'; // C
-            document.getElementById('musicScale').value = 'major';
-            document.getElementById('chordProgression').value = '1564';
-            document.getElementById('bpm').value = '160';
-            document.getElementById('antPlacement').value = 'center';
-            document.getElementById('antCount').value = '1';
-            initialRules = [
-                { turn: '1', color: '#1a1a2e', logic: 'chord_root', instrument: 'drum', octave: '0', step: 1 },
-                { turn: '3', color: '#e94560', logic: 'arpeggio', instrument: 'pluck', octave: '1', step: 1 },
-                { turn: '1', color: '#f9a826', logic: 'y_axis', instrument: 'marimba', octave: '0', step: 1 },
-                { turn: '1', color: '#4da8da', logic: 'chord_fifth', instrument: 'synth_pad', octave: '0', step: 1 },
-                { turn: '3', color: '#8e44ad', logic: 'random_scale', instrument: 'bell', octave: '1', step: 1 }
-            ];
-        } else if (num === 2) {
-            // 範例二：六角雪花 (Hex Snowflake)
-            document.getElementById('gridType').value = 'hex';
-            document.getElementById('musicKey').value = '62'; // D
-            document.getElementById('musicScale').value = 'dorian';
-            document.getElementById('chordProgression').value = '2511';
-            document.getElementById('bpm').value = '140';
-            document.getElementById('antPlacement').value = 'center';
-            document.getElementById('antCount').value = '1';
-            initialRules = [
-                { turn: '5', color: '#0f2038', logic: 'chord_root', instrument: 'harp', octave: '-1', step: 1 },
-                { turn: '4', color: '#27ae60', logic: 'chord_third', instrument: 'cello', octave: '0', step: 1 },
-                { turn: '0', color: '#f1c40f', logic: 'arpeggio', instrument: 'pluck', octave: '1', step: 1 },
-                { turn: '3', color: '#e74c3c', logic: 'y_axis', instrument: 'violin', octave: '0', step: 1 },
-                { turn: '4', color: '#9b59b6', logic: 'chord_fifth', instrument: 'synth_pad', octave: '0', step: 1 },
-                { turn: '5', color: '#3498db', logic: 'x_axis', instrument: 'bell', octave: '1', step: 1 },
-                { turn: '2', color: '#1abc9c', logic: 'random_scale', instrument: 'marimba', octave: '0', step: 1 }
-            ];
-        } else if (num === 3) {
-            // 範例三：曼陀羅舞曲 (Mandala Dance - Multi)
-            document.getElementById('gridType').value = 'square_4';
-            document.getElementById('musicKey').value = '69'; // A
+            document.getElementById('musicKey').value = '69';
             document.getElementById('musicScale').value = 'minor';
             document.getElementById('chordProgression').value = '6415';
             document.getElementById('bpm').value = '130';
@@ -505,11 +470,88 @@
                 { turn: '1', color: '#2ed573', logic: 'y_axis', instrument: 'pluck', octave: '1', step: 1 },
                 { turn: '3', color: '#ffa502', logic: 'chord_fifth', instrument: 'bass', octave: '-1', step: 1 }
             ];
+        } else if (num === 2) {
+            // 範例 2：星空迴旋 (美麗的六角雪花)
+            document.getElementById('gridType').value = 'hex';
+            document.getElementById('musicKey').value = '65'; // F
+            document.getElementById('musicScale').value = 'major';
+            document.getElementById('chordProgression').value = '1564';
+            document.getElementById('bpm').value = '140';
+            document.getElementById('antPlacement').value = 'center';
+            document.getElementById('antCount').value = '1';
+            initialRules = [
+                { turn: '1', color: '#2980b9', logic: 'chord_root', instrument: 'cello', octave: '-1', step: 1 },
+                { turn: '5', color: '#f1c40f', logic: 'arpeggio', instrument: 'harp', octave: '1', step: 1 },
+                { turn: '2', color: '#8e44ad', logic: 'y_axis', instrument: 'bell', octave: '2', step: 1 },
+                { turn: '4', color: '#27ae60', logic: 'chord_fifth', instrument: 'violin', octave: '0', step: 1 }
+            ];
+        } else if (num === 3) {
+            // 範例 3：五聲禪意 (空靈東方)
+            document.getElementById('gridType').value = 'square_8';
+            document.getElementById('musicKey').value = '60'; // C
+            document.getElementById('musicScale').value = 'pentatonic';
+            document.getElementById('chordProgression').value = '1';
+            document.getElementById('bpm').value = '160';
+            document.getElementById('antPlacement').value = 'symmetric';
+            document.getElementById('antCount').value = '4';
+            initialRules = [
+                { turn: '1', color: '#2c3e50', logic: 'chord_root', instrument: 'bass', octave: '-1', step: 1 },
+                { turn: '7', color: '#e74c3c', logic: 'arpeggio', instrument: 'marimba', octave: '0', step: 1 },
+                { turn: '2', color: '#ecf0f1', logic: 'x_axis', instrument: 'pluck', octave: '1', step: 1 }
+            ];
+        } else if (num === 4) {
+            // 範例 4：爵士光譜
+            document.getElementById('gridType').value = 'square_4';
+            document.getElementById('musicKey').value = '62'; // D
+            document.getElementById('musicScale').value = 'dorian';
+            document.getElementById('chordProgression').value = '2511';
+            document.getElementById('bpm').value = '150';
+            document.getElementById('antPlacement').value = 'center';
+            document.getElementById('antCount').value = '1';
+            initialRules = [
+                { turn: '1', color: '#16a085', logic: 'chord_root', instrument: 'organ', octave: '0', step: 1 },
+                { turn: '3', color: '#d35400', logic: 'arpeggio', instrument: 'xylophone', octave: '1', step: 1 },
+                { turn: '3', color: '#8e44ad', logic: 'y_axis', instrument: 'pluck', octave: '0', step: 1 },
+                { turn: '1', color: '#2980b9', logic: 'chord_fifth', instrument: 'bass', octave: '-1', step: 1 }
+            ];
+        } else if (num === 5) {
+            // 範例 5：王道史詩
+            document.getElementById('gridType').value = 'hex';
+            document.getElementById('musicKey').value = '67'; // G
+            document.getElementById('musicScale').value = 'major';
+            document.getElementById('chordProgression').value = '4536';
+            document.getElementById('bpm').value = '120';
+            document.getElementById('antPlacement').value = 'symmetric';
+            document.getElementById('antCount').value = '4';
+            initialRules = [
+                { turn: '1', color: '#34495e', logic: 'chord_root', instrument: 'synth_pad', octave: '0', step: 1 },
+                { turn: '2', color: '#1abc9c', logic: 'arpeggio', instrument: 'harp', octave: '1', step: 1 },
+                { turn: '4', color: '#e67e22', logic: 'y_axis', instrument: 'violin', octave: '0', step: 1 }
+            ];
+        } else if (num === 6) {
+            // 範例 6：藍調公路
+            document.getElementById('gridType').value = 'square_8';
+            document.getElementById('musicKey').value = '69'; // A
+            document.getElementById('musicScale').value = 'blues';
+            document.getElementById('chordProgression').value = '1';
+            document.getElementById('bpm').value = '200';
+            document.getElementById('antPlacement').value = 'symmetric';
+            document.getElementById('antCount').value = '4';
+            initialRules = [
+                { turn: '1', color: '#2c2c54', logic: 'chord_root', instrument: 'drum', octave: '0', step: 1 },
+                { turn: '3', color: '#ffb142', logic: 'x_axis', instrument: 'pluck', octave: '0', step: 1 },
+                { turn: '5', color: '#33d9b2', logic: 'arpeggio', instrument: 'square', octave: '1', step: 1 },
+                { turn: '7', color: '#ff5252', logic: 'random_scale', instrument: 'snare', octave: '0', step: 1 }
+            ];
         }
-
         renderRulesUI();
         fullReset();
-        alert(`✅ 已為您載入「大師級範例 ${num}」！請直接點擊「▶️ 播放」按鈕欣賞。`);
+    }
+
+    // 🌟 按鈕呼叫：一鍵載入
+    window.loadPreset = function(num) {
+        applyPresetData(num);
+        alert(`✅ 已為您載入「範例 ${num}」！請直接點擊「▶️ 播放」按鈕欣賞。`);
     }
 
     function getTurnHtml(rule, gridType) {
@@ -727,7 +769,7 @@
         const reader = new FileReader();
         reader.onload = function(event) {
             uploadedImage = new Image();
-            uploadedImage.onload = function() { } // 等待使用者按「套用」
+            uploadedImage.onload = function() { } 
             uploadedImage.src = event.target.result;
         }
         reader.readAsDataURL(file);
@@ -767,7 +809,6 @@
         uploadedImage = null;
         document.getElementById('imageUpload').value = '';
         
-        // 清除網格並重放螞蟻
         grid = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
         currentStepCount = 0;
         placeAnts();
@@ -943,7 +984,7 @@
                     [ [1, 0], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1] ];
                 ant.x += dirs[ant.dir][0]; ant.y += dirs[ant.dir][1];
             } else if (gridType === 'square_4') {
-                const sq4Dirs = [ [0,-1], [1,0], [0,1], [-1,0] ]; // 上 右 下 左
+                const sq4Dirs = [ [0,-1], [1,0], [0,1], [-1,0] ]; 
                 ant.x += sq4Dirs[ant.dir][0]; ant.y += sq4Dirs[ant.dir][1];
             } else {
                 const sq8Dirs = [ [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
@@ -988,10 +1029,7 @@
         updateRulesData(); 
         
         if (isUsingImage && uploadedImage) {
-            // 用 setTimeout 確保 updateRulesData 的顏色設定已經完全寫入
-            setTimeout(() => {
-                document.getElementById('applyImageBtn').click();
-            }, 50);
+            setTimeout(() => { document.getElementById('applyImageBtn').click(); }, 50);
         } else {
             grid = Array.from({length: gridSize}, () => Array(gridSize).fill(0));
             placeAnts(); 
@@ -1025,13 +1063,11 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', fullReset);
+    document.getElementById('clearAllBtn').addEventListener('click', () => { document.getElementById('removeImageBtn').click(); });
 
-    // --- 啟動 ---
-    // 確保一開始絕對是沒有圖片、完全留白網格的狀態
-    isUsingImage = false;
-    renderRulesUI();
-    checkSaveSlots(); 
-    fullReset(); 
+    // --- 啟動預設值：直接載入範例 1 ---
+    applyPresetData(1);
+
 </script>
 </body>
 </html>
